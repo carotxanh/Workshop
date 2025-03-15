@@ -1,0 +1,141 @@
+package com.mycompany.ticketplane.model;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.util.Date;
+
+public class Booking {
+    private int bookingId;
+    private int userId;
+    private int flightId;
+    private Date bookingDate;
+    private String seatNumber;
+    private BookingStatus status;
+    private BigDecimal totalPrice;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
+    
+    // Thêm các đối tượng liên quan để tiện sử dụng
+    private User user;
+    private Flight flight;
+    
+    public enum BookingStatus {
+        CONFIRMED, CANCELLED, PENDING
+    }
+    
+    // Constructors
+    public Booking() {}
+    
+    public Booking(int bookingId, int userId, int flightId, Date bookingDate, 
+                  String seatNumber, BookingStatus status, BigDecimal totalPrice) {
+        this.bookingId = bookingId;
+        this.userId = userId;
+        this.flightId = flightId;
+        this.bookingDate = bookingDate;
+        this.seatNumber = seatNumber;
+        this.status = status;
+        this.totalPrice = totalPrice;
+    }
+    
+    // Getters and Setters
+    public int getBookingId() {
+        return bookingId;
+    }
+    
+    public void setBookingId(int bookingId) {
+        this.bookingId = bookingId;
+    }
+    
+    public int getUserId() {
+        return userId;
+    }
+    
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+    
+    public int getFlightId() {
+        return flightId;
+    }
+    
+    public void setFlightId(int flightId) {
+        this.flightId = flightId;
+    }
+    
+    public Date getBookingDate() {
+        return bookingDate;
+    }
+    
+    public void setBookingDate(Date bookingDate) {
+        this.bookingDate = bookingDate;
+    }
+    
+    public String getSeatNumber() {
+        return seatNumber;
+    }
+    
+    public void setSeatNumber(String seatNumber) {
+        this.seatNumber = seatNumber;
+    }
+    
+    public BookingStatus getStatus() {
+        return status;
+    }
+    
+    public void setStatus(BookingStatus status) {
+        this.status = status;
+    }
+    
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
+    }
+    
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+    
+    public User getUser() {
+        return user;
+    }
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    public Flight getFlight() {
+        return flight;
+    }
+    
+    public void setFlight(Flight flight) {
+        this.flight = flight;
+    }
+    
+    public Timestamp getCreatedAt() {
+        return createdAt;
+    }
+    
+    public void setCreatedAt(Timestamp createdAt) {
+        this.createdAt = createdAt;
+    }
+    
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+    
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+    
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "bookingId=" + bookingId +
+                ", userId=" + userId +
+                ", flightId=" + flightId +
+                ", bookingDate=" + bookingDate +
+                ", seatNumber='" + seatNumber + '\'' +
+                ", status=" + status +
+                ", totalPrice=" + totalPrice +
+                '}';
+    }
+} 
