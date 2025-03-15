@@ -4,6 +4,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class PasswordUtil {
     
@@ -97,4 +98,23 @@ public class PasswordUtil {
         
         return sb.toString();
     }
+    
+    /**
+     * Kiểm tra mật khẩu người dùng nhập vào có khớp với mật khẩu đã hash trong database
+     * 
+     * @param inputPassword mật khẩu người dùng nhập vào
+     * @param hashedPassword mật khẩu đã hash trong database
+     * @return true nếu mật khẩu khớp, false nếu không khớp
+     */
+    public boolean checkPassword(String inputPassword, String hashedPassword) {
+        try {
+            // Sử dụng BCrypt để verify password
+            return BCrypt.checkpw(inputPassword, hashedPassword);
+        } catch (IllegalArgumentException e) {
+            // Log lỗi nếu có
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
 } 

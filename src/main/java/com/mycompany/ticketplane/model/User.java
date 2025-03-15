@@ -13,7 +13,7 @@ public class User {
     private Timestamp updatedAt;
     
     public enum UserRole {
-        CUSTOMER, ADMIN
+        CUSTOMER, ADMIN, USER
     }
     
     // Constructors

@@ -71,7 +71,7 @@ public class UserDAO {
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
             stmt.setString(4, user.getPhone());
-            stmt.setString(5, user.getRole().toString());
+            stmt.setString(5, user.getRole().name());
             
             int affectedRows = stmt.executeUpdate();
             
@@ -100,7 +100,7 @@ public class UserDAO {
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getPassword());
             stmt.setString(4, user.getPhone());
-            stmt.setString(5, user.getRole().toString());
+            stmt.setString(5, user.getRole().name());
             stmt.setInt(6, user.getUserId());
             
             return stmt.executeUpdate() > 0;
@@ -117,6 +117,32 @@ public class UserDAO {
             
             return stmt.executeUpdate() > 0;
         }
+    }
+    
+    public int getTotalUsers() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM User";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
+    }
+    
+    public boolean checkEmailExists(String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM User WHERE email = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        }
+        return false;
     }
     
     private User mapResultSetToUser(ResultSet rs) throws SQLException {

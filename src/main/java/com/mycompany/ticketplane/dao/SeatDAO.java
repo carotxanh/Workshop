@@ -29,12 +29,11 @@ public class SeatDAO {
     }
     
     public List<Seat> findByFlightId(int flightId) throws SQLException {
-        List<Seat> seats = new ArrayList<>();
         String sql = "SELECT * FROM Seat WHERE flight_id = ?";
+        List<Seat> seats = new ArrayList<>();
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setInt(1, flightId);
             
             try (ResultSet rs = stmt.executeQuery()) {
@@ -43,7 +42,6 @@ public class SeatDAO {
                 }
             }
         }
-        
         return seats;
     }
     
@@ -68,14 +66,11 @@ public class SeatDAO {
     
     public boolean updateSeatStatus(int flightId, String seatNumber, SeatStatus status) throws SQLException {
         String sql = "UPDATE Seat SET status = ? WHERE flight_id = ? AND seat_number = ?";
-        
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, status.toString());
+            stmt.setString(1, status.name());
             stmt.setInt(2, flightId);
             stmt.setString(3, seatNumber);
-            
             return stmt.executeUpdate() > 0;
         }
     }
@@ -157,6 +152,73 @@ public class SeatDAO {
                 conn.setAutoCommit(true);
                 conn.close();
             }
+        }
+    }
+    
+    public List<Seat> findByFlightIdAndStatus(int flightId, SeatStatus status) throws SQLException {
+        String sql = "SELECT * FROM Seat WHERE flight_id = ? AND status = ?";
+        List<Seat> seats = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, flightId);
+            stmt.setString(2, status.name());
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    seats.add(mapResultSetToSeat(rs));
+                }
+            }
+        }
+        return seats;
+    }
+
+    public Seat findBySeatNumber(int flightId, String seatNumber) throws SQLException {
+        String sql = "SELECT * FROM Seat WHERE flight_id = ? AND seat_number = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, flightId);
+            stmt.setString(2, seatNumber);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToSeat(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean insert(Seat seat) throws SQLException {
+        String sql = "INSERT INTO Seat (flight_id, seat_number, class, status) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setInt(1, seat.getFlightId());
+            stmt.setString(2, seat.getSeatNumber());
+            stmt.setString(3, seat.getSeatClass().name());
+            stmt.setString(4, seat.getStatus().name());
+            
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                return false;
+            }
+            
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    seat.setSeatId(generatedKeys.getInt(1));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean delete(int seatId) throws SQLException {
+        String sql = "DELETE FROM Seat WHERE seat_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, seatId);
+            return stmt.executeUpdate() > 0;
         }
     }
     

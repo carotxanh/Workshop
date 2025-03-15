@@ -20,7 +20,7 @@ public class Booking {
     private Flight flight;
     
     public enum BookingStatus {
-        CONFIRMED, CANCELLED, PENDING
+        CONFIRMED, CANCELLED, PENDING, COMPLETED
     }
     
     // Constructors

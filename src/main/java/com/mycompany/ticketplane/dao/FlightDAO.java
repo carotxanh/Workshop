@@ -44,12 +44,13 @@ public class FlightDAO {
     }
     
     public List<Flight> searchFlights(String origin, String destination, Date departureDate) throws SQLException {
+        String sql = "SELECT * FROM Flight WHERE origin = ? AND destination = ? " +
+                    "AND DATE(departure_time) = ? AND status = 'SCHEDULED' " +
+                    "AND available_seats > 0 ORDER BY departure_time";
         List<Flight> flights = new ArrayList<>();
-        String sql = "SELECT * FROM Flight WHERE origin = ? AND destination = ? AND DATE(departure_time) = ? AND status != 'CANCELLED'";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setString(1, origin);
             stmt.setString(2, destination);
             stmt.setDate(3, new java.sql.Date(departureDate.getTime()));
@@ -60,7 +61,6 @@ public class FlightDAO {
                 }
             }
         }
-        
         return flights;
     }
     
@@ -123,15 +123,12 @@ public class FlightDAO {
         }
     }
     
-    public boolean updateAvailableSeats(int flightId, int newAvailableSeats) throws SQLException {
-        String sql = "UPDATE Flight SET available_seats = ? WHERE flight_id = ?";
-        
+    public boolean updateAvailableSeats(int flightId, int seats) throws SQLException {
+        String sql = "UPDATE Flight SET available_seats = available_seats + ? WHERE flight_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, newAvailableSeats);
+            stmt.setInt(1, seats);
             stmt.setInt(2, flightId);
-            
             return stmt.executeUpdate() > 0;
         }
     }
@@ -146,6 +143,48 @@ public class FlightDAO {
             
             return stmt.executeUpdate() > 0;
         }
+    }
+    
+    public List<Flight> getUpcomingFlights() throws SQLException {
+        String sql = "SELECT * FROM Flight WHERE departure_time > NOW() " +
+                    "AND status = 'SCHEDULED' ORDER BY departure_time LIMIT 5";
+        List<Flight> flights = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                flights.add(mapResultSetToFlight(rs));
+            }
+        }
+        return flights;
+    }
+    
+    public boolean updateStatus(int flightId, FlightStatus status) throws SQLException {
+        String sql = "UPDATE Flight SET status = ? WHERE flight_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status.name());
+            stmt.setInt(2, flightId);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+    
+    public List<Flight> findByStatus(FlightStatus status) throws SQLException {
+        String sql = "SELECT * FROM Flight WHERE status = ? ORDER BY departure_time";
+        List<Flight> flights = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status.name());
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    flights.add(mapResultSetToFlight(rs));
+                }
+            }
+        }
+        return flights;
     }
     
     private Flight mapResultSetToFlight(ResultSet rs) throws SQLException {

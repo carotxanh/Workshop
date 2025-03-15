@@ -23,9 +23,10 @@ public class PDFGenerator {
      * @param user Thông tin người dùng
      * @param flight Thông tin chuyến bay
      * @return Mảng byte của file PDF
+     * @throws IOException Lỗi I/O
      * @throws DocumentException Lỗi khi tạo PDF
      */
-    public static byte[] generateTicket(Booking booking, User user, Flight flight) throws DocumentException {
+    public static byte[] generateTicket(Booking booking, User user, Flight flight) throws IOException, DocumentException {
         Document document = new Document(PageSize.A4);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         

@@ -30,7 +30,9 @@ public class FlightService {
     }
     
     public List<Flight> searchFlights(String origin, String destination, Date departureDate) throws SQLException {
-        return flightDAO.searchFlights(origin, destination, departureDate);
+        // Convert java.util.Date to java.sql.Date
+        java.sql.Date sqlDate = new java.sql.Date(departureDate.getTime());
+        return flightDAO.searchFlights(origin, destination, sqlDate);
     }
     
     public boolean addFlight(String airline, String flightNumber, String origin, String destination,
@@ -97,5 +99,13 @@ public class FlightService {
     
     public boolean deleteFlight(int flightId) throws SQLException {
         return flightDAO.delete(flightId);
+    }
+    
+    public List<Flight> getUpcomingFlights() throws SQLException {
+        return flightDAO.getUpcomingFlights();
+    }
+    
+    public boolean updateAvailableSeats(int flightId, int change) throws SQLException {
+        return flightDAO.updateAvailableSeats(flightId, change);
     }
 } 

@@ -8,6 +8,7 @@ import com.mycompany.ticketplane.model.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 public class BookingDAO {
     
@@ -39,23 +40,19 @@ public class BookingDAO {
     }
     
     public List<Booking> findByUserId(int userId) throws SQLException {
+        String sql = "SELECT * FROM Booking WHERE user_id = ?";
         List<Booking> bookings = new ArrayList<>();
-        String sql = "SELECT * FROM Booking WHERE user_id = ? ORDER BY booking_date DESC";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
             stmt.setInt(1, userId);
             
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Booking booking = mapResultSetToBooking(rs);
-                    booking.setFlight(flightDAO.findById(booking.getFlightId()));
-                    bookings.add(booking);
+                    bookings.add(mapResultSetToBooking(rs));
                 }
             }
         }
-        
         return bookings;
     }
     
@@ -142,52 +139,11 @@ public class BookingDAO {
     
     public boolean updateStatus(int bookingId, BookingStatus status) throws SQLException {
         String sql = "UPDATE Booking SET status = ? WHERE booking_id = ?";
-        
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        
-        try {
-            conn = DBConnection.getConnection();
-            conn.setAutoCommit(false);
-            
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, status.toString());
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status.name());
             stmt.setInt(2, bookingId);
-            
-            int affectedRows = stmt.executeUpdate();
-            
-            if (affectedRows == 0) {
-                conn.rollback();
-                return false;
-            }
-            
-            // Nếu hủy vé, cập nhật lại số ghế trống
-            if (status == BookingStatus.CANCELLED) {
-                Booking booking = findById(bookingId);
-                Flight flight = flightDAO.findById(booking.getFlightId());
-                int newAvailableSeats = flight.getAvailableSeats() + 1;
-                flightDAO.updateAvailableSeats(booking.getFlightId(), newAvailableSeats);
-            }
-            
-            conn.commit();
-            return true;
-        } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            throw e;
-        } finally {
-            if (stmt != null) {
-                stmt.close();
-            }
-            if (conn != null) {
-                conn.setAutoCommit(true);
-                conn.close();
-            }
+            return stmt.executeUpdate() > 0;
         }
     }
     
@@ -201,6 +157,65 @@ public class BookingDAO {
             
             return stmt.executeUpdate() > 0;
         }
+    }
+    
+    public int getTotalBookings() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Booking";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            return 0;
+        }
+    }
+
+    public BigDecimal getTotalRevenue() throws SQLException {
+        String sql = "SELECT SUM(total_price) FROM Booking WHERE status = 'COMPLETED'";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getBigDecimal(1);
+            }
+            return BigDecimal.ZERO;
+        }
+    }
+    
+    public List<Booking> findByStatus(BookingStatus status) throws SQLException {
+        String sql = "SELECT * FROM Booking WHERE status = ? ORDER BY booking_date DESC";
+        List<Booking> bookings = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status.name());
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    bookings.add(mapResultSetToBooking(rs));
+                }
+            }
+        }
+        return bookings;
+    }
+
+    public List<Booking> findByUserIdAndStatus(int userId, BookingStatus status) throws SQLException {
+        String sql = "SELECT * FROM Booking WHERE user_id = ? AND status = ? ORDER BY booking_date DESC";
+        List<Booking> bookings = new ArrayList<>();
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.setString(2, status.name());
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    bookings.add(mapResultSetToBooking(rs));
+                }
+            }
+        }
+        return bookings;
     }
     
     private Booking mapResultSetToBooking(ResultSet rs) throws SQLException {

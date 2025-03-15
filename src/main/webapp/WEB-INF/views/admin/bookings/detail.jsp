@@ -63,11 +63,11 @@
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Chuyến bay đi -->
                 <div class="mb-4">
                     <h6 class="border-bottom pb-2 mb-3">Chuyến bay đi</h6>
-                    
+
                     <div class="card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between">
@@ -81,7 +81,7 @@
                                     </p>
                                 </div>
                             </div>
-                            
+
                             <div class="d-flex mt-3">
                                 <div class="me-3 text-center">
                                     <p class="mb-0 fw-bold"><fmt:formatDate value="${booking.flight.departureTime}" pattern="HH:mm" /></p>
@@ -103,7 +103,7 @@
                                     <p class="mb-0 text-muted small">${booking.flight.destination}</p>
                                 </div>
                             </div>
-                            
+
                             <div class="mt-3 pt-3 border-top">
                                 <p class="mb-1"><strong>Hạng vé:</strong> 
                                     <c:choose>
@@ -132,12 +132,12 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Chuyến bay về (nếu có) -->
                 <c:if test="${not empty booking.returnFlight}">
                     <div class="mb-4">
                         <h6 class="border-bottom pb-2 mb-3">Chuyến bay về</h6>
-                        
+
                         <div class="card">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
@@ -151,7 +151,7 @@
                                         </p>
                                     </div>
                                 </div>
-                                
+
                                 <div class="d-flex mt-3">
                                     <div class="me-3 text-center">
                                         <p class="mb-0 fw-bold"><fmt:formatDate value="${booking.returnFlight.departureTime}" pattern="HH:mm" /></p>
@@ -173,7 +173,7 @@
                                         <p class="mb-0 text-muted small">${booking.returnFlight.destination}</p>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mt-3 pt-3 border-top">
                                     <p class="mb-1"><strong>Hạng vé:</strong> 
                                         <c:choose>
@@ -203,11 +203,11 @@
                         </div>
                     </div>
                 </c:if>
-                
+
                 <!-- Thông tin hành khách -->
                 <div class="mb-4">
                     <h6 class="border-bottom pb-2 mb-3">Thông tin hành khách</h6>
-                    
+
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead class="table-light">
@@ -237,11 +237,11 @@
                         </table>
                     </div>
                 </div>
-                
+
                 <!-- Thông tin liên hệ -->
                 <div class="mb-4">
                     <h6 class="border-bottom pb-2 mb-3">Thông tin liên hệ</h6>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <p class="mb-1"><strong>Họ tên:</strong> ${booking.contactName}</p>
@@ -253,11 +253,11 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Chi tiết thanh toán -->
                 <div>
                     <h6 class="border-bottom pb-2 mb-3">Chi tiết thanh toán</h6>
-                    
+
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <tbody>
@@ -286,7 +286,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-lg-4">
         <div class="card shadow mb-4">
             <div class="card-header py-3">
@@ -298,23 +298,23 @@
                         <i class="fas fa-check me-2"></i>Xác nhận đặt vé
                     </a>
                 </c:if>
-                
+
                 <c:if test="${booking.status ne 'CANCELLED'}">
                     <button type="button" class="btn btn-danger btn-block mb-3 w-100" data-bs-toggle="modal" data-bs-target="#cancelBookingModal">
                         <i class="fas fa-times-circle me-2"></i>Hủy đặt vé
                     </button>
                 </c:if>
-                
+
                 <a href="${pageContext.request.contextPath}/admin/bookings/${booking.bookingNumber}/print" class="btn btn-primary btn-block mb-3 w-100" target="_blank">
                     <i class="fas fa-print me-2"></i>In vé điện tử
                 </a>
-                
+
                 <a href="${pageContext.request.contextPath}/admin/bookings/${booking.bookingNumber}/email" class="btn btn-info btn-block w-100">
                     <i class="fas fa-envelope me-2"></i>Gửi lại email
                 </a>
             </div>
         </div>
-        
+
         <div class="card shadow mb-4">
             <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Lịch sử hoạt động</h6>
@@ -328,7 +328,7 @@
                             <p class="small text-muted mb-0"><fmt:formatDate value="${booking.bookingDate}" pattern="dd/MM/yyyy HH:mm" /></p>
                         </div>
                     </div>
-                    
+
                     <c:if test="${booking.status eq 'CONFIRMED' || booking.status eq 'CANCELLED'}">
                         <div class="timeline-item">
                             <div class="timeline-marker ${booking.status eq 'CONFIRMED' ? 'bg-primary' : 'bg-danger'}"></div>
@@ -338,7 +338,7 @@
                             </div>
                         </div>
                     </c:if>
-                    
+
                     <c:if test="${not empty booking.paymentDate}">
                         <div class="timeline-item">
                             <div class="timeline-marker bg-success"></div>
@@ -378,75 +378,75 @@
 </div>
 
 <style>
-.flight-line {
-    position: relative;
-    height: 2px;
-    background-color: #ddd;
-    width: 100%;
-}
+    .flight-line {
+        position: relative;
+        height: 2px;
+        background-color: #ddd;
+        width: 100%;
+    }
 
-.flight-line i {
-    position: absolute;
-    top: -10px;
-    right: 0;
-    color: #0d6efd;
-    transform: rotate(90deg);
-}
+    .flight-line i {
+        position: absolute;
+        top: -10px;
+        right: 0;
+        color: #0d6efd;
+        transform: rotate(90deg);
+    }
 
-.timeline {
-    position: relative;
-    padding-left: 30px;
-}
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
 
-.timeline-item {
-    position: relative;
-    padding-bottom: 20px;
-}
+    .timeline-item {
+        position: relative;
+        padding-bottom: 20px;
+    }
 
-.timeline-item:last-child {
-    padding-bottom: 0;
-}
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
 
-.timeline-item:before {
-    content: '';
-    position: absolute;
-    left: -18px;
-    top: 0;
-    height: 100%;
-    width: 2px;
-    background-color: #e9ecef;
-}
+    .timeline-item:before {
+        content: '';
+        position: absolute;
+        left: -18px;
+        top: 0;
+        height: 100%;
+        width: 2px;
+        background-color: #e9ecef;
+    }
 
-.timeline-marker {
-    position: absolute;
-    left: -24px;
-    top: 0;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: #0d6efd;
-    z-index: 1;
-}
+    .timeline-marker {
+        position: absolute;
+        left: -24px;
+        top: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #0d6efd;
+        z-index: 1;
+    }
 
-.timeline-content {
-    padding-bottom: 10px;
-}
+    .timeline-content {
+        padding-bottom: 10px;
+    }
 
-.timeline-item:last-child .timeline-content {
-    padding-bottom: 0;
-}
+    .timeline-item:last-child .timeline-content {
+        padding-bottom: 0;
+    }
 </style>
 
 <script>
-$(document).ready(function() {
-    // Thêm lý do hủy vào URL khi xác nhận hủy
-    $('#confirmCancelBtn').click(function(e) {
-        e.preventDefault();
-        const reason = $('#cancelReason').val();
-        const href = $(this).attr('href');
-        window.location.href = href + '?reason=' + encodeURIComponent(reason);
+    $(document).ready(function () {
+        // Thêm lý do hủy vào URL khi xác nhận hủy
+        $('#confirmCancelBtn').click(function (e) {
+            e.preventDefault();
+            const reason = $('#cancelReason').val();
+            const href = $(this).attr('href');
+            window.location.href = href + '?reason=' + encodeURIComponent(reason);
+        });
     });
-});
 </script>
 
 <jsp:include page="/WEB-INF/views/admin/common/footer.jsp" /> 

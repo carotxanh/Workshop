@@ -11,9 +11,11 @@ import java.util.List;
 public class UserService {
     
     private UserDAO userDAO;
+    private PasswordUtil passwordUtil;
     
     public UserService() {
         this.userDAO = new UserDAO();
+        this.passwordUtil = new PasswordUtil();
     }
     
     public User findById(int userId) throws SQLException {
@@ -35,17 +37,16 @@ public class UserService {
     }
     
     public boolean register(String name, String email, String password, String phone) throws SQLException {
-        // Kiểm tra email đã tồn tại chưa
-        if (userDAO.findByEmail(email) != null) {
+        if (userDAO.checkEmailExists(email)) {
             return false;
         }
         
         User user = new User();
         user.setName(name);
         user.setEmail(email);
-        user.setPassword(PasswordUtil.hashPassword(password));
+        user.setPassword(passwordUtil.hashPassword(password));
         user.setPhone(phone);
-        user.setRole(UserRole.CUSTOMER);
+        user.setRole(UserRole.USER);
         
         return userDAO.insert(user);
     }
@@ -98,5 +99,30 @@ public class UserService {
     
     public boolean deleteUser(int userId) throws SQLException {
         return userDAO.delete(userId);
+    }
+    
+    public int getTotalUsers() throws SQLException {
+        return userDAO.getTotalUsers();
+    }
+    
+    public User authenticate(String email, String password) throws SQLException {
+        User user = userDAO.findByEmail(email);
+        if (user != null && passwordUtil.checkPassword(password, user.getPassword())) {
+            return user;
+        }
+        return null;
+    }
+    
+    public boolean updateProfile(User user, String currentPassword, String newPassword) throws SQLException {
+        User existingUser = userDAO.findById(user.getUserId());
+        if (existingUser != null && PasswordUtil.verifyPassword(currentPassword, existingUser.getPassword())) {
+            if (newPassword != null && !newPassword.isEmpty()) {
+                user.setPassword(PasswordUtil.hashPassword(newPassword));
+            } else {
+                user.setPassword(existingUser.getPassword());
+            }
+            return userDAO.update(user);
+        }
+        return false;
     }
 } 

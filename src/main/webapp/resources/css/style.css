@@ -1,0 +1,39 @@
+/* Custom styles */
+.hero-section {
+    background: linear-gradient(45deg, #1e3c72, #2a5298);
+    padding: 4rem 0;
+}
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
+}
+
+.seat-map {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.seat {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.seat.available {
+    background-color: #d4edda;
+}
+
+.seat.selected {
+    background-color: #cce5ff;
+}
+
+.seat.booked {
+    background-color: #f8d7da;
+    cursor: not-allowed;
+} 

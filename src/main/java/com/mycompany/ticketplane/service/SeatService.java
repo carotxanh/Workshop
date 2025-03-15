@@ -49,4 +49,16 @@ public class SeatService {
     public boolean deleteSeat(int seatId) throws SQLException {
         return seatDAO.delete(seatId);
     }
+    
+    public List<Seat> getAvailableSeats(int flightId) throws SQLException {
+        return seatDAO.findAvailableSeatsByFlightId(flightId);
+    }
+    
+    public boolean initializeSeatsForFlight(int flightId, int economySeats, int businessSeats, int firstClassSeats) throws SQLException {
+        return seatDAO.insertSeatsForFlight(flightId, economySeats, businessSeats, firstClassSeats);
+    }
+    
+    public List<Seat> getSeatsByFlightId(int flightId) throws SQLException {
+        return seatDAO.findByFlightId(flightId);
+    }
 } 

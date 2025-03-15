@@ -71,20 +71,29 @@ public class BookingService {
     
     public boolean cancelBooking(int bookingId) throws SQLException {
         Booking booking = bookingDAO.findById(bookingId);
-        
-        if (booking == null) {
-            return false;
+        if (booking != null && booking.getStatus() != BookingStatus.COMPLETED) {
+            // Cập nhật trạng thái booking
+            boolean updated = bookingDAO.updateStatus(bookingId, BookingStatus.CANCELLED);
+            if (updated) {
+                // Cập nhật trạng thái ghế
+                seatDAO.updateSeatStatus(booking.getFlightId(), booking.getSeatNumber(), SeatStatus.AVAILABLE);
+                // Cập nhật số ghế trống của chuyến bay
+                flightDAO.updateAvailableSeats(booking.getFlightId(), 1);
+                return true;
+            }
         }
-        
-        // Cập nhật trạng thái booking
-        boolean statusUpdated = bookingDAO.updateStatus(bookingId, BookingStatus.CANCELLED);
-        
-        if (statusUpdated) {
-            // Cập nhật trạng thái ghế
-            seatDAO.updateSeatStatus(booking.getFlightId(), booking.getSeatNumber(), SeatStatus.AVAILABLE);
-            return true;
-        }
-        
         return false;
+    }
+    
+    public int getTotalBookings() throws SQLException {
+        return bookingDAO.getTotalBookings();
+    }
+    
+    public BigDecimal getTotalRevenue() throws SQLException {
+        return bookingDAO.getTotalRevenue();
+    }
+    
+    public List<Booking> getBookingsByUserId(int userId) throws SQLException {
+        return bookingDAO.findByUserId(userId);
     }
 } 
