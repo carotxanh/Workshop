@@ -12,7 +12,7 @@ public class PaymentDAO {
     public Payment findById(int paymentId) throws SQLException {
         String sql = "SELECT * FROM Payment WHERE payment_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, paymentId);
@@ -31,7 +31,7 @@ public class PaymentDAO {
         String sql = "SELECT * FROM Payment WHERE booking_id = ? ORDER BY payment_date DESC";
         List<Payment> payments = new ArrayList<>();
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, bookingId);
@@ -51,7 +51,7 @@ public class PaymentDAO {
                 "card_number, card_name, transaction_id, refund_for, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             
             stmt.setInt(1, payment.getBookingId());
@@ -90,7 +90,7 @@ public class PaymentDAO {
                 "transaction_id = ?, refund_for = ?, updated_at = NOW() " +
                 "WHERE payment_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, payment.getBookingId());

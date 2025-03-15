@@ -1,5 +1,7 @@
-    </div>
-    <footer class="bg-dark text-white mt-5 py-4">
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<footer class="bg-dark text-white mt-5 py-4">
         <div class="container">
             <div class="row">
                 <div class="col-md-4">

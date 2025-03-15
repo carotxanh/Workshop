@@ -14,11 +14,14 @@ public class BookingDAO {
     
     private UserDAO userDAO = new UserDAO();
     private FlightDAO flightDAO = new FlightDAO();
+    private Connection connection = null;
+    private PreparedStatement statement = null;
+    private ResultSet resultSet = null;
     
     public Booking findById(int bookingId) throws SQLException {
         String sql = "SELECT * FROM Booking WHERE booking_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, bookingId);
@@ -39,19 +42,21 @@ public class BookingDAO {
         return null;
     }
     
-    public List<Booking> findByUserId(int userId) throws SQLException {
-        String sql = "SELECT * FROM Booking WHERE user_id = ?";
+    public List<Booking> findByUserId(int userId) {
         List<Booking> bookings = new ArrayList<>();
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    bookings.add(mapResultSetToBooking(rs));
-                }
+        String sql = "SELECT * FROM Booking WHERE user_id = ?";
+        try {
+            Connection conn = new DBConnection().getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, userId);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                bookings.add(mapResultSetToBooking(resultSet));
             }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            closeResources();
         }
         return bookings;
     }
@@ -60,7 +65,7 @@ public class BookingDAO {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT * FROM Booking ORDER BY booking_date DESC";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             
@@ -83,7 +88,8 @@ public class BookingDAO {
         PreparedStatement stmt = null;
         
         try {
-            conn = DBConnection.getConnection();
+            DBConnection dbConnection = new DBConnection();
+            conn = dbConnection.getConnection();
             conn.setAutoCommit(false);
             
             stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -139,7 +145,7 @@ public class BookingDAO {
     
     public boolean updateStatus(int bookingId, BookingStatus status) throws SQLException {
         String sql = "UPDATE Booking SET status = ? WHERE booking_id = ?";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status.name());
             stmt.setInt(2, bookingId);
@@ -150,7 +156,7 @@ public class BookingDAO {
     public boolean delete(int bookingId) throws SQLException {
         String sql = "DELETE FROM Booking WHERE booking_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, bookingId);
@@ -159,21 +165,26 @@ public class BookingDAO {
         }
     }
     
-    public int getTotalBookings() throws SQLException {
+    public int getTotalBookings() {
         String sql = "SELECT COUNT(*) FROM Booking";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
+        try {
+            Connection conn = new DBConnection().getConnection();
+            statement = connection.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt(1);
             }
-            return 0;
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        } finally {
+            closeResources();
         }
+        return 0;
     }
 
     public BigDecimal getTotalRevenue() throws SQLException {
         String sql = "SELECT SUM(total_price) FROM Booking WHERE status = 'COMPLETED'";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             if (rs.next()) {
@@ -187,7 +198,7 @@ public class BookingDAO {
         String sql = "SELECT * FROM Booking WHERE status = ? ORDER BY booking_date DESC";
         List<Booking> bookings = new ArrayList<>();
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status.name());
             
@@ -204,7 +215,7 @@ public class BookingDAO {
         String sql = "SELECT * FROM Booking WHERE user_id = ? AND status = ? ORDER BY booking_date DESC";
         List<Booking> bookings = new ArrayList<>();
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = new DBConnection().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             stmt.setString(2, status.name());
@@ -230,5 +241,21 @@ public class BookingDAO {
         booking.setCreatedAt(rs.getTimestamp("created_at"));
         booking.setUpdatedAt(rs.getTimestamp("updated_at"));
         return booking;
+    }
+
+    private void closeResources() {
+        try {
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 } 

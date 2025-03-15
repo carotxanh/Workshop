@@ -3,8 +3,8 @@ package com.mycompany.ticketplane.model;
 import java.sql.Timestamp;
 
 public class Seat {
-    private int seatId;
-    private int flightId;
+    private Integer seatId;
+    private Integer flightId;
     private String seatNumber;
     private SeatClass seatClass;
     private SeatStatus status;
@@ -22,7 +22,7 @@ public class Seat {
     // Constructors
     public Seat() {}
     
-    public Seat(int seatId, int flightId, String seatNumber, SeatClass seatClass, SeatStatus status) {
+    public Seat(Integer seatId, Integer flightId, String seatNumber, SeatClass seatClass, SeatStatus status) {
         this.seatId = seatId;
         this.flightId = flightId;
         this.seatNumber = seatNumber;
@@ -31,19 +31,19 @@ public class Seat {
     }
     
     // Getters and Setters
-    public int getSeatId() {
+    public Integer getSeatId() {
         return seatId;
     }
     
-    public void setSeatId(int seatId) {
+    public void setSeatId(Integer seatId) {
         this.seatId = seatId;
     }
     
-    public int getFlightId() {
+    public Integer getFlightId() {
         return flightId;
     }
     
-    public void setFlightId(int flightId) {
+    public void setFlightId(Integer flightId) {
         this.flightId = flightId;
     }
     

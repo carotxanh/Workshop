@@ -37,18 +37,22 @@ public class UserService {
     }
     
     public boolean register(String name, String email, String password, String phone) throws SQLException {
-        if (userDAO.checkEmailExists(email)) {
-            return false;
+        try {
+            if (userDAO.checkEmailExists(email)) {
+                return false;
+            }
+            
+            User user = new User();
+            user.setName(name);
+            user.setEmail(email);
+            user.setPassword(passwordUtil.hashPassword(password));
+            user.setPhone(phone);
+            user.setRole(UserRole.USER);
+            
+            return userDAO.insert(user);
+        } catch (SQLException e) {
+            throw new SQLException("Error during registration: " + e.getMessage(), e);
         }
-        
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(passwordUtil.hashPassword(password));
-        user.setPhone(phone);
-        user.setRole(UserRole.USER);
-        
-        return userDAO.insert(user);
     }
     
     public boolean updateProfile(int userId, String name, String email, String phone) throws SQLException {

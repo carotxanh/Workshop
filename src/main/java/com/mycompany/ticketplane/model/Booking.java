@@ -5,9 +5,9 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 public class Booking {
-    private int bookingId;
-    private int userId;
-    private int flightId;
+    private Integer bookingId;
+    private Integer userId;
+    private Integer flightId;
     private Date bookingDate;
     private String seatNumber;
     private BookingStatus status;
@@ -26,7 +26,7 @@ public class Booking {
     // Constructors
     public Booking() {}
     
-    public Booking(int bookingId, int userId, int flightId, Date bookingDate, 
+    public Booking(Integer bookingId, Integer userId, Integer flightId, Date bookingDate, 
                   String seatNumber, BookingStatus status, BigDecimal totalPrice) {
         this.bookingId = bookingId;
         this.userId = userId;
@@ -38,27 +38,27 @@ public class Booking {
     }
     
     // Getters and Setters
-    public int getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
     
-    public void setBookingId(int bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
     
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
     
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
     
-    public int getFlightId() {
+    public Integer getFlightId() {
         return flightId;
     }
     
-    public void setFlightId(int flightId) {
+    public void setFlightId(Integer flightId) {
         this.flightId = flightId;
     }
     

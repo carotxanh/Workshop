@@ -18,10 +18,6 @@
                         <label for="password" class="form-label">Mật khẩu</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
-                        <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
-                    </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">Đăng nhập</button>
                     </div>

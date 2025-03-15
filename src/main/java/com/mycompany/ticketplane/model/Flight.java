@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 public class Flight {
-    private int flightId;
+    private Integer flightId;
     private String airline;
     private String flightNumber;
     private String origin;
@@ -15,7 +15,7 @@ public class Flight {
     private Date arrivalTime;
     private Time duration;
     private BigDecimal price;
-    private int availableSeats;
+    private Integer availableSeats;
     private FlightStatus status;
     private Timestamp createdAt;
     private Timestamp updatedAt;
@@ -27,9 +27,9 @@ public class Flight {
     // Constructors
     public Flight() {}
     
-    public Flight(int flightId, String airline, String flightNumber, String origin, String destination, 
+    public Flight(Integer flightId, String airline, String flightNumber, String origin, String destination, 
                  Date departureTime, Date arrivalTime, Time duration, BigDecimal price, 
-                 int availableSeats, FlightStatus status) {
+                 Integer availableSeats, FlightStatus status) {
         this.flightId = flightId;
         this.airline = airline;
         this.flightNumber = flightNumber;
@@ -44,11 +44,11 @@ public class Flight {
     }
     
     // Getters and Setters
-    public int getFlightId() {
+    public Integer getFlightId() {
         return flightId;
     }
     
-    public void setFlightId(int flightId) {
+    public void setFlightId(Integer flightId) {
         this.flightId = flightId;
     }
     
@@ -116,11 +116,11 @@ public class Flight {
         this.price = price;
     }
     
-    public int getAvailableSeats() {
+    public Integer getAvailableSeats() {
         return availableSeats;
     }
     
-    public void setAvailableSeats(int availableSeats) {
+    public void setAvailableSeats(Integer availableSeats) {
         this.availableSeats = availableSeats;
     }
     

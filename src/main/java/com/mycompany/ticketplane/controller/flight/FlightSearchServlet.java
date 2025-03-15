@@ -87,10 +87,21 @@ public class FlightSearchServlet extends HttpServlet {
             // Chuyển hướng đến trang kết quả tìm kiếm
             request.getRequestDispatcher("/WEB-INF/views/flight/search-results.jsp").forward(request, response);
         } catch (ParseException e) {
-            request.setAttribute("error", "Định dạng ngày không hợp lệ");
+            request.setAttribute("departureDateError", "Định dạng ngày không hợp lệ");
+            
+            // Giữ lại dữ liệu đã nhập
+            request.setAttribute("origin", origin);
+            request.setAttribute("destination", destination);
+            
             request.getRequestDispatcher("/WEB-INF/views/flight/search.jsp").forward(request, response);
         } catch (SQLException e) {
             request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            
+            // Giữ lại dữ liệu đã nhập
+            request.setAttribute("origin", origin);
+            request.setAttribute("destination", destination);
+            request.setAttribute("departureDate", departureDateStr);
+            
             request.getRequestDispatcher("/WEB-INF/views/flight/search.jsp").forward(request, response);
         }
     }

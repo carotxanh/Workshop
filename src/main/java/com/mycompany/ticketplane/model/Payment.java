@@ -5,8 +5,8 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 public class Payment {
-    private int paymentId;
-    private int bookingId;
+    private Integer paymentId;
+    private Integer bookingId;
     private BigDecimal amount;
     private Date paymentDate;
     private String paymentMethod;
@@ -26,19 +26,19 @@ public class Payment {
     public Payment() {}
     
     // Getters and Setters
-    public int getPaymentId() {
+    public Integer getPaymentId() {
         return paymentId;
     }
     
-    public void setPaymentId(int paymentId) {
+    public void setPaymentId(Integer paymentId) {
         this.paymentId = paymentId;
     }
     
-    public int getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
     
-    public void setBookingId(int bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
     

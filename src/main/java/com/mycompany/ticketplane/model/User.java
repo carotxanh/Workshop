@@ -3,7 +3,7 @@ package com.mycompany.ticketplane.model;
 import java.sql.Timestamp;
 
 public class User {
-    private int userId;
+    private Integer userId;
     private String name;
     private String email;
     private String password;
@@ -19,7 +19,7 @@ public class User {
     // Constructors
     public User() {}
     
-    public User(int userId, String name, String email, String password, String phone, UserRole role) {
+    public User(Integer userId, String name, String email, String password, String phone, UserRole role) {
         this.userId = userId;
         this.name = name;
         this.email = email;
@@ -29,11 +29,11 @@ public class User {
     }
     
     // Getters and Setters
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
     
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
     
