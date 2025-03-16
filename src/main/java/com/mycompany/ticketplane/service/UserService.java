@@ -154,4 +154,31 @@ public class UserService {
     public List<User> getRecentUsers(int limit) throws SQLException {
         return userDAO.getRecentUsers(limit);
     }
+
+    public List<User> getAllUsers() throws SQLException {
+        return userDAO.findAll();
+    }
+
+    public User getUserById(int userId) throws SQLException {
+        return userDAO.findById(userId);
+    }
+
+    public boolean createUser(User user) throws SQLException {
+        // Hash the password before storing
+        user.setPassword(passwordUtil.hashPassword(user.getPassword()));
+        return userDAO.insert(user);
+    }
+
+    public boolean updateUser(User user) throws SQLException {
+        // If the password is already hashed (from existing user), don't hash it again
+        User existingUser = userDAO.findById(user.getUserId());
+        if (existingUser != null) {
+            // Only hash the password if it's different from the existing one
+            if (!user.getPassword().equals(existingUser.getPassword())) {
+                user.setPassword(passwordUtil.hashPassword(user.getPassword()));
+            }
+            return userDAO.update(user);
+        }
+        return false;
+    }
 } 

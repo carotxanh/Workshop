@@ -4,14 +4,322 @@
     Author     : FPTSHOP
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>User Details - Admin Dashboard</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            :root {
+                --primary-color: #4e73df;
+                --secondary-color: #858796;
+                --success-color: #1cc88a;
+                --info-color: #36b9cc;
+                --warning-color: #f6c23e;
+                --danger-color: #e74a3b;
+                --light-color: #f8f9fc;
+                --dark-color: #5a5c69;
+            }
+            
+            body {
+                background-color: #f8f9fc;
+                font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            }
+            
+            /* Sidebar styles */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 100;
+                padding: 48px 0 0;
+                box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+                background: linear-gradient(180deg, var(--primary-color) 10%, #224abe 100%);
+                transition: all 0.3s;
+            }
+            
+            .sidebar-sticky {
+                position: relative;
+                top: 0;
+                height: calc(100vh - 48px);
+                padding-top: .5rem;
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            
+            .sidebar .nav-link {
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.8);
+                padding: 1rem;
+                margin-bottom: 0.2rem;
+                border-radius: 0.35rem;
+                transition: all 0.3s;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0.5rem;
+                color: rgba(255, 255, 255, 0.3);
+                transition: all 0.3s;
+            }
+            
+            .sidebar .nav-link.active {
+                color: #fff;
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .sidebar .nav-link.active i {
+                color: #fff;
+            }
+            
+            .sidebar .nav-link:hover {
+                color: #fff;
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            
+            .sidebar .nav-link:hover i {
+                color: #fff;
+            }
+            
+            .sidebar-heading {
+                font-size: .75rem;
+                text-transform: uppercase;
+                color: rgba(255, 255, 255, 0.5);
+                font-weight: 800;
+                letter-spacing: 0.05rem;
+                padding: 0.75rem 1rem;
+            }
+            
+            main {
+                padding-top: 24px;
+            }
+            
+            .card {
+                border: none;
+                box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+                border-radius: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .card-header {
+                background-color: #f8f9fc;
+                border-bottom: 1px solid #e3e6f0;
+                padding: 1rem 1.35rem;
+                font-weight: 700;
+                color: var(--dark-color);
+            }
+            
+            .info-item {
+                padding: 0.75rem 1.25rem;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+            
+            .info-item:last-child {
+                border-bottom: none;
+            }
+            
+            .info-label {
+                font-weight: 600;
+                color: var(--dark-color);
+            }
+            
+            .badge-role {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .badge-admin {
+                background-color: #4e73df;
+                color: white;
+            }
+            
+            .badge-customer {
+                background-color: #1cc88a;
+                color: white;
+            }
+            
+            .badge-user {
+                background-color: #f6c23e;
+                color: white;
+            }
+        </style>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <!-- Include Header -->
+        <jsp:include page="../common/header.jsp">
+            <jsp:param name="title" value="User Details" />
+        </jsp:include>
+
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                    <div class="position-sticky pt-3 sidebar-sticky">
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">
+                                    <i class="bi bi-speedometer2"></i>Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/booking-management">
+                                    <i class="bi bi-calendar-check"></i>Bookings
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/flight-management">
+                                    <i class="bi bi-airplane"></i>Flights
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="${pageContext.request.contextPath}/admin/user-management">
+                                    <i class="bi bi-people"></i>Users
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/reports">
+                                    <i class="bi bi-graph-up"></i>Reports
+                                </a>
+                            </li>
+                        </ul>
+                        
+                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1">
+                            <span>System</span>
+                        </h6>
+                        <ul class="nav flex-column mb-2">
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/settings">
+                                    <i class="bi bi-gear"></i>Settings
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="${pageContext.request.contextPath}/logout">
+                                    <i class="bi bi-box-arrow-right"></i>Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- Main Content -->
+                <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">User Details</h1>
+                        <div class="btn-toolbar mb-2 mb-md-0">
+                            <div class="btn-group me-2">
+                                <a href="user-management" class="btn btn-sm btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Back to List
+                                </a>
+                                <a href="user-management?action=edit&id=${user.userId}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i> Edit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <i class="bi bi-person-fill me-1"></i>
+                                    Personal Information
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="info-item">
+                                        <div class="row">
+                                            <div class="col-md-4 info-label">User ID</div>
+                                            <div class="col-md-8">${user.userId}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="row">
+                                            <div class="col-md-4 info-label">Full Name</div>
+                                            <div class="col-md-8">${user.name}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="row">
+                                            <div class="col-md-4 info-label">Email</div>
+                                            <div class="col-md-8">${user.email}</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="row">
+                                            <div class="col-md-4 info-label">Phone</div>
+                                            <div class="col-md-8">${user.phone}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <i class="bi bi-shield-lock-fill me-1"></i>
+                                    Account Information
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="info-item">
+                                        <div class="row">
+                                            <div class="col-md-4 info-label">Role</div>
+                                            <div class="col-md-8">
+                                                <c:choose>
+                                                    <c:when test="${user.role == 'ADMIN'}">
+                                                        <span class="badge badge-role badge-admin">ADMIN</span>
+                                                    </c:when>
+                                                    <c:when test="${user.role == 'CUSTOMER'}">
+                                                        <span class="badge badge-role badge-customer">CUSTOMER</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="badge badge-role badge-user">USER</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="row">
+                                            <div class="col-md-4 info-label">Created At</div>
+                                            <div class="col-md-8">
+                                                <fmt:formatDate value="${user.createdAt}" pattern="dd/MM/yyyy HH:mm:ss" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <div class="row">
+                                            <div class="col-md-4 info-label">Last Updated</div>
+                                            <div class="col-md-8">
+                                                <fmt:formatDate value="${user.updatedAt}" pattern="dd/MM/yyyy HH:mm:ss" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                        <a href="user-management" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-arrow-left me-1"></i> Back to List
+                        </a>
+                        <a href="user-management?action=edit&id=${user.userId}" class="btn btn-primary">
+                            <i class="bi bi-pencil me-1"></i> Edit User
+                        </a>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- Include Footer -->
+        <jsp:include page="../common/footer.jsp" />
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
