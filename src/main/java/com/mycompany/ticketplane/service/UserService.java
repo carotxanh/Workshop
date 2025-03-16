@@ -9,33 +9,33 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UserService {
-    
+
     private UserDAO userDAO;
     private PasswordUtil passwordUtil;
-    
+
     public UserService() {
         this.userDAO = new UserDAO();
         this.passwordUtil = new PasswordUtil();
     }
-    
+
     public User findById(int userId) throws SQLException {
         return userDAO.findById(userId);
     }
-    
+
     public List<User> findAll() throws SQLException {
         return userDAO.findAll();
     }
-    
+
     public User login(String email, String password) throws SQLException {
         User user = userDAO.findByEmail(email);
-        
+
         if (user != null && PasswordUtil.verifyPassword(password, user.getPassword())) {
             return user;
         }
-        
+
         return null;
     }
-    
+
     public boolean register(String name, String email, String password, String phone) throws SQLException {
         if (userDAO.checkEmailExists(email)) {
             return false;
@@ -48,14 +48,14 @@ public class UserService {
         user.setRole(UserRole.USER);
         return userDAO.insert(user);
     }
-    
+
     public boolean updateProfile(int userId, String name, String email, String phone) throws SQLException {
         User user = userDAO.findById(userId);
-        
+
         if (user == null) {
             return false;
         }
-        
+
         // Kiểm tra email đã tồn tại chưa (nếu thay đổi email)
         if (!user.getEmail().equals(email)) {
             User existingUser = userDAO.findByEmail(email);
@@ -63,46 +63,46 @@ public class UserService {
                 return false;
             }
         }
-        
+
         user.setName(name);
         user.setEmail(email);
         user.setPhone(phone);
-        
+
         return userDAO.update(user);
     }
-    
+
     public boolean changePassword(int userId, String oldPassword, String newPassword) throws SQLException {
         User user = userDAO.findById(userId);
-        
+
         if (user == null || !PasswordUtil.verifyPassword(oldPassword, user.getPassword())) {
             return false;
         }
-        
+
         user.setPassword(PasswordUtil.hashPassword(newPassword));
-        
+
         return userDAO.update(user);
     }
-    
+
     public boolean resetPassword(String email, String newPassword) throws SQLException {
         User user = userDAO.findByEmail(email);
-        
+
         if (user == null) {
             return false;
         }
-        
+
         user.setPassword(PasswordUtil.hashPassword(newPassword));
-        
+
         return userDAO.update(user);
     }
-    
+
     public boolean deleteUser(int userId) throws SQLException {
         return userDAO.delete(userId);
     }
-    
+
     public int getTotalUsers() throws SQLException {
         return userDAO.getTotalUsers();
     }
-    
+
     public User authenticate(String email, String password) throws SQLException {
         User user = userDAO.findByEmail(email);
         if (user != null && passwordUtil.checkPassword(password, user.getPassword())) {
@@ -110,7 +110,7 @@ public class UserService {
         }
         return null;
     }
-    
+
     public boolean updateProfile(User user, String currentPassword, String newPassword) throws SQLException {
         User existingUser = userDAO.findById(user.getUserId());
         if (existingUser != null && PasswordUtil.verifyPassword(currentPassword, existingUser.getPassword())) {
@@ -123,9 +123,10 @@ public class UserService {
         }
         return false;
     }
-    
+
     /**
      * Lấy số lượng người dùng mới theo tháng và năm
+     *
      * @param month Tháng (1-12)
      * @param year Năm
      * @return Số lượng người dùng mới trong tháng
@@ -134,9 +135,10 @@ public class UserService {
     public int getNewUserCountByMonth(int month, int year) throws SQLException {
         return userDAO.getNewUserCountByMonth(month, year);
     }
-    
+
     /**
      * Lấy số lượng người dùng theo vai trò
+     *
      * @param role Vai trò người dùng
      * @return Số lượng người dùng theo vai trò
      * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
@@ -144,9 +146,10 @@ public class UserService {
     public int getUserCountByRole(String role) throws SQLException {
         return userDAO.getUserCountByRole(role);
     }
-    
+
     /**
      * Lấy danh sách người dùng mới nhất
+     *
      * @param limit Số lượng người dùng cần lấy
      * @return Danh sách người dùng mới nhất
      * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
@@ -166,6 +169,7 @@ public class UserService {
     public boolean createUser(User user) throws SQLException {
         // Hash the password before storing
         user.setPassword(passwordUtil.hashPassword(user.getPassword()));
+        // Call the insert method that returns a boolean
         return userDAO.insert(user);
     }
 
@@ -181,4 +185,15 @@ public class UserService {
         }
         return false;
     }
-} 
+
+    /**
+     * Checks if a user with the given email already exists
+     *
+     * @param email The email to check
+     * @return true if the email exists, false otherwise
+     * @throws SQLException if a database error occurs
+     */
+    public boolean isEmailExists(String email) throws SQLException {
+        return userDAO.isEmailExists(email);
+    }
+}

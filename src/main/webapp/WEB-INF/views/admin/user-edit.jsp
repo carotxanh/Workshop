@@ -1,8 +1,3 @@
-<%-- 
-    Document   : user-edit
-    Created on : Mar 16, 2025, 5:15:02 PM
-    Author     : FPTSHOP
---%>
 
 <%@ page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

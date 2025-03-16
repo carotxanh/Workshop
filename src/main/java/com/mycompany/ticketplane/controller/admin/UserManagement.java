@@ -163,7 +163,7 @@ public class UserManagement extends HttpServlet {
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         request.setAttribute("roles", UserRole.values());
-        request.getRequestDispatcher("/WEB-INF/views/admin/user-edit.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/admin/user-add.jsp").forward(request, response);
     }
     
     private void createUser(HttpServletRequest request, HttpServletResponse response) 
@@ -173,6 +173,7 @@ public class UserManagement extends HttpServlet {
             String name = request.getParameter("name");
             String email = request.getParameter("email");
             String password = request.getParameter("password");
+            String confirmPassword = request.getParameter("confirmPassword");
             String phone = request.getParameter("phone");
             String roleStr = request.getParameter("role");
             
@@ -180,11 +181,36 @@ public class UserManagement extends HttpServlet {
             if (name == null || name.trim().isEmpty() ||
                 email == null || email.trim().isEmpty() ||
                 password == null || password.trim().isEmpty() ||
+                confirmPassword == null || confirmPassword.trim().isEmpty() ||
                 roleStr == null || roleStr.trim().isEmpty()) {
                 
                 request.setAttribute("error", "Please fill in all required fields");
                 request.setAttribute("roles", UserRole.values());
-                request.getRequestDispatcher("/WEB-INF/views/admin/user-edit.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/views/admin/user-add.jsp").forward(request, response);
+                return;
+            }
+            
+            // Validate password length
+            if (password.length() < 6) {
+                request.setAttribute("error", "Password must be at least 6 characters long");
+                request.setAttribute("roles", UserRole.values());
+                request.getRequestDispatcher("/WEB-INF/views/admin/user-add.jsp").forward(request, response);
+                return;
+            }
+            
+            // Validate password confirmation
+            if (!password.equals(confirmPassword)) {
+                request.setAttribute("error", "Passwords do not match");
+                request.setAttribute("roles", UserRole.values());
+                request.getRequestDispatcher("/WEB-INF/views/admin/user-add.jsp").forward(request, response);
+                return;
+            }
+            
+            // Check if email already exists
+            if (userService.isEmailExists(email)) {
+                request.setAttribute("error", "Email already exists. Please use a different email address.");
+                request.setAttribute("roles", UserRole.values());
+                request.getRequestDispatcher("/WEB-INF/views/admin/user-add.jsp").forward(request, response);
                 return;
             }
             
@@ -205,17 +231,17 @@ public class UserManagement extends HttpServlet {
             } else {
                 request.setAttribute("error", "Could not create user");
                 request.setAttribute("roles", UserRole.values());
-                request.getRequestDispatcher("/WEB-INF/views/admin/user-edit.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/views/admin/user-add.jsp").forward(request, response);
             }
             
         } catch (IllegalArgumentException e) {
             request.setAttribute("error", "Invalid data: " + e.getMessage());
             request.setAttribute("roles", UserRole.values());
-            request.getRequestDispatcher("/WEB-INF/views/admin/user-edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/user-add.jsp").forward(request, response);
         } catch (SQLException e) {
             request.setAttribute("error", "Database error: " + e.getMessage());
             request.setAttribute("roles", UserRole.values());
-            request.getRequestDispatcher("/WEB-INF/views/admin/user-edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/user-add.jsp").forward(request, response);
         }
     }
     

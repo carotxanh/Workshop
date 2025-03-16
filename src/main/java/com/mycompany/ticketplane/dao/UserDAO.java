@@ -79,29 +79,35 @@ public class UserDAO extends DBConnection {
     }
 
     /**
-     * Thêm người dùng mới vào cơ sở dữ liệu
-     * @param user Đối tượng User cần thêm
-     * @return true nếu thêm thành công, false nếu thất bại
-     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     * Inserts a new user into the database
+     * 
+     * @param user The user to insert
+     * @return true if successful, false otherwise
+     * @throws SQLException if a database error occurs
      */
     public boolean insert(User user) throws SQLException {
         String sql = "INSERT INTO user (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)";
         
         try {
-            // Đảm bảo kết nối được mở mới
             connection = getConnection();
-            statement = connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, user.getName());
             statement.setString(2, user.getEmail());
             statement.setString(3, user.getPassword());
             statement.setString(4, user.getPhone());
             statement.setString(5, user.getRole().toString());
             
-            int rowsInserted = statement.executeUpdate();
-            return rowsInserted > 0;
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
-            throw ex;
+            int affectedRows = statement.executeUpdate();
+            
+            if (affectedRows > 0) {
+                // Get the generated ID if needed for future use
+                resultSet = statement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    user.setUserId(resultSet.getInt(1));
+                }
+                return true;
+            }
+            return false;
         } finally {
             closeResources();
         }
@@ -254,5 +260,32 @@ public class UserDAO extends DBConnection {
         user.setCreatedAt(rs.getTimestamp("created_at"));
         user.setUpdatedAt(rs.getTimestamp("updated_at"));
         return user;
+    }
+
+    /**
+     * Checks if a user with the given email already exists
+     * 
+     * @param email The email to check
+     * @return true if the email exists, false otherwise
+     * @throws SQLException if a database error occurs
+     */
+    public boolean isEmailExists(String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM user WHERE email = ?";
+        
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, email);
+            
+            resultSet = statement.executeQuery();
+            
+            if (resultSet.next()) {
+                return resultSet.getInt(1) > 0;
+            }
+            
+            return false;
+        } finally {
+            closeResources();
+        }
     }
 }
