@@ -5,6 +5,7 @@ import com.mycompany.ticketplane.model.Flight.FlightStatus;
 import com.mycompany.ticketplane.model.User;
 import com.mycompany.ticketplane.service.FlightService;
 import com.mycompany.ticketplane.service.SeatService;
+import com.mycompany.ticketplane.service.BookingService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -27,11 +28,13 @@ public class FlightManagementServlet extends HttpServlet {
     
     private FlightService flightService;
     private SeatService seatService;
+    private BookingService bookingService;
     
     @Override
     public void init() throws ServletException {
         flightService = new FlightService();
         seatService = new SeatService();
+        bookingService = new BookingService();
     }
     
     @Override
@@ -51,12 +54,14 @@ public class FlightManagementServlet extends HttpServlet {
             return;
         }
         
-        String pathInfo = request.getPathInfo();
-        String action = pathInfo == null ? "list" : pathInfo.substring(1);
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "list";
+        }
         
         switch (action) {
-            case "create":
-                showCreateForm(request, response);
+            case "add":
+                showAddForm(request, response);
                 break;
             case "edit":
                 showEditForm(request, response);
@@ -64,7 +69,7 @@ public class FlightManagementServlet extends HttpServlet {
             case "delete":
                 deleteFlight(request, response);
                 break;
-            case "detail":
+            case "view":
                 showFlightDetail(request, response);
                 break;
             case "list":
@@ -91,11 +96,13 @@ public class FlightManagementServlet extends HttpServlet {
             return;
         }
         
-        String pathInfo = request.getPathInfo();
-        String action = pathInfo == null ? "list" : pathInfo.substring(1);
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "list";
+        }
         
         switch (action) {
-            case "create":
+            case "add":
                 createFlight(request, response);
                 break;
             case "edit":
@@ -112,65 +119,58 @@ public class FlightManagementServlet extends HttpServlet {
         try {
             List<Flight> flights = flightService.getAllFlights();
             request.setAttribute("flights", flights);
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/list.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-list.jsp").forward(request, response);
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/list.jsp").forward(request, response);
+            request.setAttribute("error", "System error: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-list.jsp").forward(request, response);
         }
     }
     
-    private void showCreateForm(HttpServletRequest request, HttpServletResponse response) 
+    private void showAddForm(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
     }
     
     private void createFlight(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         try {
-            // Lấy dữ liệu từ form
+            // Get form data
             String flightNumber = request.getParameter("flightNumber");
             String airline = request.getParameter("airline");
             String origin = request.getParameter("origin");
             String destination = request.getParameter("destination");
-            String departureDateStr = request.getParameter("departureDate");
             String departureTimeStr = request.getParameter("departureTime");
-            String arrivalDateStr = request.getParameter("arrivalDate");
             String arrivalTimeStr = request.getParameter("arrivalTime");
             String priceStr = request.getParameter("price");
-            String seatsStr = request.getParameter("availableSeats");
-            String economySeatsStr = request.getParameter("economySeats");
-            String businessSeatsStr = request.getParameter("businessSeats");
-            String firstClassSeatsStr = request.getParameter("firstClassSeats");
-            String statusStr = request.getParameter("status");
+            String totalSeatsStr = request.getParameter("totalSeats");
             
-            // Validate input
-            if (flightNumber == null || airline == null || origin == null || destination == null ||
-                departureDateStr == null || departureTimeStr == null || arrivalDateStr == null || 
-                arrivalTimeStr == null || priceStr == null || seatsStr == null || 
-                economySeatsStr == null || businessSeatsStr == null || firstClassSeatsStr == null || 
-                statusStr == null) {
+            // Validate required fields
+            if (flightNumber == null || flightNumber.trim().isEmpty() ||
+                airline == null || airline.trim().isEmpty() ||
+                origin == null || origin.trim().isEmpty() ||
+                destination == null || destination.trim().isEmpty() ||
+                departureTimeStr == null || departureTimeStr.trim().isEmpty() ||
+                arrivalTimeStr == null || arrivalTimeStr.trim().isEmpty() ||
+                priceStr == null || priceStr.trim().isEmpty() ||
+                totalSeatsStr == null || totalSeatsStr.trim().isEmpty()) {
                 
-                request.setAttribute("error", "Vui lòng điền đầy đủ thông tin");
-                request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+                request.setAttribute("error", "Please fill in all required fields");
+                request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
                 return;
             }
             
             // Parse date and time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
             SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             
-            Date departureDate = dateFormat.parse(departureDateStr);
-            Date departureTime = timeFormat.parse(departureTimeStr);
-            Date arrivalDate = dateFormat.parse(arrivalDateStr);
-            Date arrivalTime = timeFormat.parse(arrivalTimeStr);
+            Date departureDateTime = dateTimeFormat.parse(departureTimeStr);
+            Date arrivalDateTime = dateTimeFormat.parse(arrivalTimeStr);
             
-            // Combine date and time
-            String departureDateTimeStr = departureDateStr + " " + departureTimeStr;
-            String arrivalDateTimeStr = arrivalDateStr + " " + arrivalTimeStr;
-            
-            Date departureDateTime = dateTimeFormat.parse(departureDateTimeStr);
-            Date arrivalDateTime = dateTimeFormat.parse(arrivalDateTimeStr);
+            // Validate departure and arrival times
+            if (arrivalDateTime.before(departureDateTime)) {
+                request.setAttribute("error", "Arrival time must be after departure time");
+                request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
+                return;
+            }
             
             // Calculate duration
             long durationMillis = arrivalDateTime.getTime() - departureDateTime.getTime();
@@ -178,11 +178,7 @@ public class FlightManagementServlet extends HttpServlet {
             
             // Parse other values
             BigDecimal price = new BigDecimal(priceStr);
-            int availableSeats = Integer.parseInt(seatsStr);
-            int economySeats = Integer.parseInt(economySeatsStr);
-            int businessSeats = Integer.parseInt(businessSeatsStr);
-            int firstClassSeats = Integer.parseInt(firstClassSeatsStr);
-            FlightStatus status = FlightStatus.valueOf(statusStr);
+            int totalSeats = Integer.parseInt(totalSeatsStr);
             
             // Create flight object
             Flight flight = new Flight();
@@ -194,39 +190,39 @@ public class FlightManagementServlet extends HttpServlet {
             flight.setArrivalTime(new java.sql.Timestamp(arrivalDateTime.getTime()));
             flight.setDuration(duration);
             flight.setPrice(price);
-            flight.setAvailableSeats(availableSeats);
-            flight.setStatus(status);
+            flight.setStatus(FlightStatus.SCHEDULED);
             
             // Save to database
             boolean success = flightService.createFlight(flight);
             
             if (success) {
-                // Initialize seats for the flight
-                seatService.initializeSeatsForFlight(
-                    flight.getFlightId(), 
-                    economySeats, 
-                    businessSeats, 
-                    firstClassSeats
-                );
-                
-                request.getSession().setAttribute("success", "Thêm chuyến bay thành công");
-                response.sendRedirect(request.getContextPath() + "/admin/flights");
+                // Lấy ID của chuyến bay vừa tạo
+                Flight createdFlight = flightService.findByFlightNumber(flightNumber);
+                if (createdFlight != null) {
+                    // Tạo ghế cho chuyến bay
+                    seatService.createSeatsForFlight(createdFlight.getFlightId(), totalSeats);
+                    
+                    request.getSession().setAttribute("success", "Flight created successfully");
+                    response.sendRedirect(request.getContextPath() + "/admin/flight-management");
+                } else {
+                    request.setAttribute("error", "Flight created but could not create seats");
+                    request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
+                }
             } else {
-                request.setAttribute("error", "Không thể thêm chuyến bay");
-                request.setAttribute("flight", flight);
-                request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+                request.setAttribute("error", "Could not create flight");
+                request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
             }
             
         } catch (ParseException e) {
-            request.setAttribute("error", "Dữ liệu ngày tháng không hợp lệ: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+            request.setAttribute("error", "Invalid date format: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
         } catch (IllegalArgumentException e) {
-            // Bao gồm cả NumberFormatException vì nó là con của IllegalArgumentException
-            request.setAttribute("error", "Dữ liệu không hợp lệ: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+            // Includes NumberFormatException
+            request.setAttribute("error", "Invalid data: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
         }
     }
     
@@ -237,78 +233,74 @@ public class FlightManagementServlet extends HttpServlet {
             Flight flight = flightService.findById(flightId);
             
             if (flight == null) {
-                request.getSession().setAttribute("error", "Không tìm thấy chuyến bay");
-                response.sendRedirect(request.getContextPath() + "/admin/flights");
+                request.getSession().setAttribute("error", "Flight not found");
+                response.sendRedirect(request.getContextPath() + "/admin/flight-management");
                 return;
             }
             
             request.setAttribute("flight", flight);
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-edit.jsp").forward(request, response);
             
         } catch (NumberFormatException e) {
-            request.getSession().setAttribute("error", "ID chuyến bay không hợp lệ");
-            response.sendRedirect(request.getContextPath() + "/admin/flights");
+            request.getSession().setAttribute("error", "Invalid flight ID");
+            response.sendRedirect(request.getContextPath() + "/admin/flight-management");
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+            request.setAttribute("error", "System error: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-list.jsp").forward(request, response);
         }
     }
     
     private void updateFlight(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         try {
-            // Lấy ID chuyến bay
             int flightId = Integer.parseInt(request.getParameter("flightId"));
-            
-            // Lấy thông tin chuyến bay hiện tại
             Flight flight = flightService.findById(flightId);
             
             if (flight == null) {
-                request.getSession().setAttribute("error", "Không tìm thấy chuyến bay");
-                response.sendRedirect(request.getContextPath() + "/admin/flights");
+                request.getSession().setAttribute("error", "Flight not found");
+                response.sendRedirect(request.getContextPath() + "/admin/flight-management");
                 return;
             }
             
-            // Lấy dữ liệu từ form
+            // Get form data
             String flightNumber = request.getParameter("flightNumber");
             String airline = request.getParameter("airline");
             String origin = request.getParameter("origin");
             String destination = request.getParameter("destination");
-            String departureDateStr = request.getParameter("departureDate");
             String departureTimeStr = request.getParameter("departureTime");
-            String arrivalDateStr = request.getParameter("arrivalDate");
             String arrivalTimeStr = request.getParameter("arrivalTime");
             String priceStr = request.getParameter("price");
-            String seatsStr = request.getParameter("availableSeats");
             String statusStr = request.getParameter("status");
             
-            // Validate input
-            if (flightNumber == null || airline == null || origin == null || destination == null ||
-                departureDateStr == null || departureTimeStr == null || arrivalDateStr == null || 
-                arrivalTimeStr == null || priceStr == null || seatsStr == null || statusStr == null) {
+            // Validate required fields
+            if (flightNumber == null || flightNumber.trim().isEmpty() ||
+                airline == null || airline.trim().isEmpty() ||
+                origin == null || origin.trim().isEmpty() ||
+                destination == null || destination.trim().isEmpty() ||
+                departureTimeStr == null || departureTimeStr.trim().isEmpty() ||
+                arrivalTimeStr == null || arrivalTimeStr.trim().isEmpty() ||
+                priceStr == null || priceStr.trim().isEmpty() ||
+                statusStr == null || statusStr.trim().isEmpty()) {
                 
-                request.setAttribute("error", "Vui lòng điền đầy đủ thông tin");
+                request.setAttribute("error", "Please fill in all required fields");
                 request.setAttribute("flight", flight);
-                request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/views/admin/flight-edit.jsp").forward(request, response);
                 return;
             }
             
             // Parse date and time
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
             SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             
-            Date departureDate = dateFormat.parse(departureDateStr);
-            Date departureTime = timeFormat.parse(departureTimeStr);
-            Date arrivalDate = dateFormat.parse(arrivalDateStr);
-            Date arrivalTime = timeFormat.parse(arrivalTimeStr);
+            Date departureDateTime = dateTimeFormat.parse(departureTimeStr);
+            Date arrivalDateTime = dateTimeFormat.parse(arrivalTimeStr);
             
-            // Combine date and time
-            String departureDateTimeStr = departureDateStr + " " + departureTimeStr;
-            String arrivalDateTimeStr = arrivalDateStr + " " + arrivalTimeStr;
-            
-            Date departureDateTime = dateTimeFormat.parse(departureDateTimeStr);
-            Date arrivalDateTime = dateTimeFormat.parse(arrivalDateTimeStr);
+            // Validate departure and arrival times
+            if (arrivalDateTime.before(departureDateTime)) {
+                request.setAttribute("error", "Arrival time must be after departure time");
+                request.setAttribute("flight", flight);
+                request.getRequestDispatcher("/WEB-INF/views/admin/flight-edit.jsp").forward(request, response);
+                return;
+            }
             
             // Calculate duration
             long durationMillis = arrivalDateTime.getTime() - departureDateTime.getTime();
@@ -316,7 +308,6 @@ public class FlightManagementServlet extends HttpServlet {
             
             // Parse other values
             BigDecimal price = new BigDecimal(priceStr);
-            int availableSeats = Integer.parseInt(seatsStr);
             FlightStatus status = FlightStatus.valueOf(statusStr);
             
             // Update flight object
@@ -328,31 +319,30 @@ public class FlightManagementServlet extends HttpServlet {
             flight.setArrivalTime(new java.sql.Timestamp(arrivalDateTime.getTime()));
             flight.setDuration(duration);
             flight.setPrice(price);
-            flight.setAvailableSeats(availableSeats);
             flight.setStatus(status);
             
             // Save to database
             boolean success = flightService.updateFlight(flight);
             
             if (success) {
-                request.getSession().setAttribute("success", "Cập nhật chuyến bay thành công");
-                response.sendRedirect(request.getContextPath() + "/admin/flights");
+                request.getSession().setAttribute("success", "Flight updated successfully");
+                response.sendRedirect(request.getContextPath() + "/admin/flight-management");
             } else {
-                request.setAttribute("error", "Không thể cập nhật chuyến bay");
+                request.setAttribute("error", "Could not update flight");
                 request.setAttribute("flight", flight);
-                request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+                request.getRequestDispatcher("/WEB-INF/views/admin/flight-edit.jsp").forward(request, response);
             }
             
         } catch (ParseException e) {
-            request.setAttribute("error", "Dữ liệu ngày tháng không hợp lệ: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+            request.setAttribute("error", "Invalid date format: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-edit.jsp").forward(request, response);
         } catch (IllegalArgumentException e) {
-            // Bao gồm cả NumberFormatException vì nó là con của IllegalArgumentException
-            request.setAttribute("error", "Dữ liệu không hợp lệ: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+            // Includes NumberFormatException
+            request.setAttribute("error", "Invalid data: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-edit.jsp").forward(request, response);
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/form.jsp").forward(request, response);
+            request.setAttribute("error", "Database error: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-edit.jsp").forward(request, response);
         }
     }
     
@@ -361,22 +351,31 @@ public class FlightManagementServlet extends HttpServlet {
         try {
             int flightId = Integer.parseInt(request.getParameter("id"));
             
+            // Check if flight has bookings
+            boolean hasBookings = bookingService.hasBookingsForFlight(flightId);
+            
+            if (hasBookings) {
+                request.getSession().setAttribute("error", "Cannot delete flight. There are bookings associated with this flight.");
+                response.sendRedirect(request.getContextPath() + "/admin/flight-management");
+                return;
+            }
+            
             boolean success = flightService.deleteFlight(flightId);
             
             if (success) {
-                request.getSession().setAttribute("success", "Xóa chuyến bay thành công");
+                request.getSession().setAttribute("success", "Flight deleted successfully");
             } else {
-                request.getSession().setAttribute("error", "Không thể xóa chuyến bay. Chuyến bay có thể đã được đặt vé.");
+                request.getSession().setAttribute("error", "Could not delete flight");
             }
             
-            response.sendRedirect(request.getContextPath() + "/admin/flights");
+            response.sendRedirect(request.getContextPath() + "/admin/flight-management");
             
         } catch (NumberFormatException e) {
-            request.getSession().setAttribute("error", "ID chuyến bay không hợp lệ");
-            response.sendRedirect(request.getContextPath() + "/admin/flights");
+            request.getSession().setAttribute("error", "Invalid flight ID");
+            response.sendRedirect(request.getContextPath() + "/admin/flight-management");
         } catch (SQLException e) {
-            request.getSession().setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/admin/flights");
+            request.getSession().setAttribute("error", "System error: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/admin/flight-management");
         }
     }
     
@@ -387,20 +386,23 @@ public class FlightManagementServlet extends HttpServlet {
             Flight flight = flightService.findById(flightId);
             
             if (flight == null) {
-                request.getSession().setAttribute("error", "Không tìm thấy chuyến bay");
-                response.sendRedirect(request.getContextPath() + "/admin/flights");
+                request.getSession().setAttribute("error", "Flight not found");
+                response.sendRedirect(request.getContextPath() + "/admin/flight-management");
                 return;
             }
             
+            // Get bookings for this flight
+            flight.setBookings(bookingService.getBookingsByFlightId(flightId));
+            
             request.setAttribute("flight", flight);
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/detail.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-detail.jsp").forward(request, response);
             
         } catch (NumberFormatException e) {
-            request.getSession().setAttribute("error", "ID chuyến bay không hợp lệ");
-            response.sendRedirect(request.getContextPath() + "/admin/flights");
+            request.getSession().setAttribute("error", "Invalid flight ID");
+            response.sendRedirect(request.getContextPath() + "/admin/flight-management");
         } catch (SQLException e) {
-            request.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/admin/flights/list.jsp").forward(request, response);
+            request.setAttribute("error", "System error: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-list.jsp").forward(request, response);
         }
     }
 } 

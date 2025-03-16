@@ -391,4 +391,26 @@ public class BookingService {
         
         return booking;
     }
+    
+    /**
+     * Kiểm tra xem chuyến bay có đặt vé nào không
+     * 
+     * @param flightId ID của chuyến bay
+     * @return true nếu có đặt vé, false nếu không
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public boolean hasBookingsForFlight(int flightId) throws SQLException {
+        return bookingDAO.hasBookingsForFlight(flightId);
+    }
+    
+    /**
+     * Lấy danh sách đặt vé theo ID chuyến bay
+     * 
+     * @param flightId ID của chuyến bay
+     * @return Danh sách các đặt vé
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<Booking> getBookingsByFlightId(int flightId) throws SQLException {
+        return bookingDAO.getBookingsByFlightId(flightId);
+    }
 } 

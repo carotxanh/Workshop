@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 public class Flight {
     private Integer flightId;
@@ -19,6 +20,7 @@ public class Flight {
     private FlightStatus status;
     private Timestamp createdAt;
     private Timestamp updatedAt;
+    private List<Booking> bookings;
     
     public enum FlightStatus {
         SCHEDULED,    // Đã lên lịch
@@ -152,6 +154,14 @@ public class Flight {
         this.updatedAt = updatedAt;
     }
     
+    public List<Booking> getBookings() {
+        return bookings;
+    }
+    
+    public void setBookings(List<Booking> bookings) {
+        this.bookings = bookings;
+    }
+    
     @Override
     public String toString() {
         return "Flight{" +
@@ -162,6 +172,7 @@ public class Flight {
                 ", destination='" + destination + '\'' +
                 ", departureTime=" + departureTime +
                 ", arrivalTime=" + arrivalTime +
+                ", duration=" + duration +
                 ", price=" + price +
                 ", availableSeats=" + availableSeats +
                 ", status=" + status +

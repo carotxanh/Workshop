@@ -380,4 +380,21 @@ public class SeatDAO extends DBConnection {
             closeResources();
         }
     }
+
+    /**
+     * Tạo ghế cho chuyến bay với số lượng ghế được chỉ định
+     * 
+     * @param flightId ID của chuyến bay
+     * @param totalSeats Tổng số ghế cần tạo
+     * @return true nếu tạo thành công, false nếu thất bại
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public boolean createSeatsForFlight(Integer flightId, int totalSeats) throws SQLException {
+        // Phân bổ số ghế cho từng hạng
+        int economySeats = (int) (totalSeats * 0.7); // 70% là ghế Economy
+        int businessSeats = (int) (totalSeats * 0.2); // 20% là ghế Business
+        int firstClassSeats = totalSeats - economySeats - businessSeats; // 10% còn lại là First Class
+        
+        return insertSeatsForFlight(flightId, economySeats, businessSeats, firstClassSeats);
+    }
 }

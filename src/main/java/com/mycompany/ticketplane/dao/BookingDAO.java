@@ -973,4 +973,76 @@ public class BookingDAO extends DBConnection {
             Logger.getLogger(BookingDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    /**
+     * Kiểm tra xem chuyến bay có đặt vé nào không
+     * 
+     * @param flightId ID của chuyến bay
+     * @return true nếu có đặt vé, false nếu không
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public boolean hasBookingsForFlight(int flightId) throws SQLException {
+        boolean hasBookings = false;
+        String sql = "SELECT COUNT(*) FROM Booking WHERE flight_id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, flightId);
+            rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                hasBookings = rs.getInt(1) > 0;
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(BookingDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        } finally {
+            closeResources(rs, stmt, conn);
+        }
+        
+        return hasBookings;
+    }
+
+    /**
+     * Lấy danh sách đặt vé theo ID chuyến bay
+     * 
+     * @param flightId ID của chuyến bay
+     * @return Danh sách các đặt vé
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<Booking> getBookingsByFlightId(int flightId) throws SQLException {
+        List<Booking> bookings = new ArrayList<>();
+        String sql = "SELECT * FROM Booking WHERE flight_id = ?";
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, flightId);
+            rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                Booking booking = mapResultSetToBooking(rs);
+                
+                // Lấy thông tin người dùng
+                User user = userDAO.findById(booking.getUserId());
+                booking.setUser(user);
+                
+                bookings.add(booking);
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(BookingDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        } finally {
+            closeResources(rs, stmt, conn);
+        }
+        
+        return bookings;
+    }
 } 

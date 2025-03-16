@@ -258,12 +258,6 @@
                     <div class="position-sticky pt-3 sidebar-sticky">
                         <ul class="nav flex-column">
                             <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/dashboard">
-                                    <i class="bi bi-speedometer2"></i>
-                                    Dashboard
-                                </a>
-                            </li>
-                            <li class="nav-item">
                                 <a class="nav-link active" href="${pageContext.request.contextPath}/admin/booking-management">
                                     <i class="bi bi-calendar-check"></i>
                                     Bookings
@@ -279,18 +273,6 @@
                                 <a class="nav-link" href="${pageContext.request.contextPath}/admin/user-management">
                                     <i class="bi bi-people"></i>
                                     Users
-                                </a>
-                            </li>
-                        </ul>
-                        
-                        <div class="sidebar-heading">
-                            System
-                        </div>
-                        <ul class="nav flex-column mb-2">
-                            <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/logout">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                    Logout
                                 </a>
                             </li>
                         </ul>

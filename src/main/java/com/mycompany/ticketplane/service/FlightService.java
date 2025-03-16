@@ -213,4 +213,14 @@ public class FlightService {
     public List<Flight> searchFlights(String origin, String destination, java.sql.Date departureDate) throws SQLException {
         return flightDAO.searchFlights(origin, destination, departureDate);
     }
+
+    /**
+     * Tìm chuyến bay theo số hiệu
+     * @param flightNumber Số hiệu chuyến bay
+     * @return Đối tượng Flight nếu tìm thấy, null nếu không tìm thấy
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public Flight findByFlightNumber(String flightNumber) throws SQLException {
+        return flightDAO.findByFlightNumber(flightNumber);
+    }
 } 

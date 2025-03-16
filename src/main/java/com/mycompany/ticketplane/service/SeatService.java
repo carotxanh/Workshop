@@ -98,4 +98,16 @@ public class SeatService {
     public boolean updateSeatStatusByFlightAndSeatNumber(Integer flightId, String seatNumber, String status) throws SQLException {
         return seatDAO.updateSeatStatusByFlightAndSeatNumber(flightId, seatNumber, status);
     }
+    
+    /**
+     * Tạo ghế cho chuyến bay với số lượng ghế được chỉ định
+     * 
+     * @param flightId ID của chuyến bay
+     * @param totalSeats Tổng số ghế cần tạo
+     * @return true nếu tạo thành công, false nếu thất bại
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public boolean createSeatsForFlight(Integer flightId, int totalSeats) throws SQLException {
+        return seatDAO.createSeatsForFlight(flightId, totalSeats);
+    }
 } 

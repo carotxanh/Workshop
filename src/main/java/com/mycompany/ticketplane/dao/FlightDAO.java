@@ -462,4 +462,27 @@ public class FlightDAO extends DBConnection {
         
         return flights;
     }
+
+    public Flight findByFlightNumber(String flightNumber) throws SQLException {
+        Flight flight = null;
+        String sql = "SELECT * FROM Flight WHERE flight_number = ?";
+        
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, flightNumber);
+            resultSet = statement.executeQuery();
+            
+            if (resultSet.next()) {
+                flight = mapResultSetToFlight(resultSet);
+            }
+        } catch (SQLException ex) {
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+            throw ex;
+        } finally {
+            closeResources();
+        }
+        
+        return flight;
+    }
 } 
