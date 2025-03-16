@@ -34,7 +34,7 @@
                         </li>
                         <c:if test="${not empty sessionScope.user}">
                             <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/booking">Lịch sử đặt vé</a>
+                                <a class="nav-link" href="${pageContext.request.contextPath}/booking?action=list">Lịch sử đặt vé</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="${pageContext.request.contextPath}/profileController">Trang cá nhân</a>
@@ -65,7 +65,7 @@
                                             <li><hr class="dropdown-divider"></li>
                                             </c:if>
                                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/profileController">Thông tin cá nhân</a></li>
-                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/bookings">Lịch sử đặt vé</a></li>
+                                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/booking?action=list">Lịch sử đặt vé</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/logout">Đăng xuất</a></li>
                                     </ul>

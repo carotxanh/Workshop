@@ -371,4 +371,24 @@ public class BookingService {
     public boolean updateBooking(Booking booking) throws SQLException {
         return bookingDAO.update(booking);
     }
+    
+    /**
+     * Lấy thông tin đặt vé kèm theo chi tiết chuyến bay
+     * 
+     * @param bookingId ID của đặt vé
+     * @return Đối tượng Booking với thông tin chuyến bay
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public Booking getBookingWithFlightDetails(int bookingId) throws SQLException {
+        Booking booking = bookingDAO.findById(bookingId);
+        
+        if (booking != null) {
+            // Lấy thông tin chuyến bay
+            FlightDAO flightDAO = new FlightDAO();
+            Flight flight = flightDAO.findById(booking.getFlightId());
+            booking.setFlight(flight);
+        }
+        
+        return booking;
+    }
 } 

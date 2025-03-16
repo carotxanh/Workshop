@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@WebServlet("/booking/*")
+@WebServlet("/booking")
 public class BookingServlet extends HttpServlet {
     
     private BookingService bookingService;
@@ -67,6 +67,9 @@ public class BookingServlet extends HttpServlet {
                 break;
             case "cancel":
                 cancelBooking(request, response);
+                break;
+            case "detail":
+                showBookingDetail(request, response);
                 break;
             default:
                 showFlightsPage(request, response);
@@ -375,6 +378,63 @@ public class BookingServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/booking?action=list");
         } catch (SQLException e) {
             session.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/booking?action=list");
+        }
+    }
+    
+    /**
+     * Hiển thị chi tiết đặt vé
+     */
+    private void showBookingDetail(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        // Kiểm tra đăng nhập
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        User user = (User) session.getAttribute("user");
+        String bookingIdStr = request.getParameter("id");
+        
+        if (bookingIdStr == null || bookingIdStr.isEmpty()) {
+            response.sendRedirect(request.getContextPath() + "/booking?action=list");
+            return;
+        }
+        
+        try {
+            int bookingId = Integer.parseInt(bookingIdStr);
+            
+            // Get booking with flight details included
+            Booking booking = bookingService.getBookingWithFlightDetails(bookingId);
+            
+            if (booking == null || booking.getUserId() != user.getUserId()) {
+                session.setAttribute("error", "Không tìm thấy đặt vé hoặc bạn không có quyền xem đặt vé này");
+                response.sendRedirect(request.getContextPath() + "/booking?action=list");
+                return;
+            }
+            
+            // Add debug information
+            System.out.println("Booking ID: " + booking.getBookingId());
+            System.out.println("Flight ID: " + booking.getFlightId());
+            System.out.println("Flight: " + (booking.getFlight() != null ? booking.getFlight().getFlightNumber() : "null"));
+            
+            request.setAttribute("booking", booking);
+            request.getRequestDispatcher("/WEB-INF/views/booking/detail.jsp").forward(request, response);
+            
+        } catch (NumberFormatException e) {
+            System.out.println("Number Format Exception: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/booking?action=list");
+        } catch (SQLException e) {
+            System.out.println("SQL Exception: " + e.getMessage());
+            e.printStackTrace();
+            session.setAttribute("error", "Lỗi hệ thống: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/booking?action=list");
+        } catch (Exception e) {
+            System.out.println("General Exception: " + e.getMessage());
+            e.printStackTrace();
+            session.setAttribute("error", "Lỗi không xác định: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/booking?action=list");
         }
     }

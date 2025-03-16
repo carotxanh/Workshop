@@ -97,17 +97,36 @@
         </div>
     </div>
     <div class="row">
-        <c:forEach items="${destinations}" var="destination" begin="0" end="5">
-            <div class="col-md-4 mb-4">
-                <div class="card destination-card shadow-sm">
-                    <div class="card-body p-4">
-                        <h4 class="card-title">${destination.name}</h4>
-                        <p class="card-text">${destination.city}, ${destination.country}</p>
-                        <a href="${pageContext.request.contextPath}/booking?action=search&destination=${destination.locationId}" class="btn btn-outline-primary">Xem chuyến bay</a>
-                    </div>
+        <div class="col-md-4 mb-4">
+            <div class="card destination-card shadow-sm">
+                <img src="${pageContext.request.contextPath}/resources/images/hanoi.jpg" class="card-img-top" alt="Hà Nội">
+                <div class="card-body p-4">
+                    <h4 class="card-title">Hà Nội</h4>
+                    <p class="card-text">Thủ đô ngàn năm văn hiến với nhiều di tích lịch sử và văn hóa</p>
+                    <a href="${pageContext.request.contextPath}/booking?action=search&destination=1" class="btn btn-outline-primary">Xem chuyến bay</a>
                 </div>
             </div>
-        </c:forEach>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card destination-card shadow-sm">
+                <img src="${pageContext.request.contextPath}/resources/images/danang.jpg" class="card-img-top" alt="Đà Nẵng">
+                <div class="card-body p-4">
+                    <h4 class="card-title">Đà Nẵng</h4>
+                    <p class="card-text">Thành phố biển xinh đẹp với cầu Rồng và bãi biển Mỹ Khê nổi tiếng</p>
+                    <a href="${pageContext.request.contextPath}/booking?action=search&destination=2" class="btn btn-outline-primary">Xem chuyến bay</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card destination-card shadow-sm">
+                <img src="${pageContext.request.contextPath}/resources/images/hochiminh.jpg" class="card-img-top" alt="Hồ Chí Minh">
+                <div class="card-body p-4">
+                    <h4 class="card-title">Hồ Chí Minh</h4>
+                    <p class="card-text">Thành phố năng động với nhiều địa điểm mua sắm và ẩm thực đa dạng</p>
+                    <a href="${pageContext.request.contextPath}/booking?action=search&destination=3" class="btn btn-outline-primary">Xem chuyến bay</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

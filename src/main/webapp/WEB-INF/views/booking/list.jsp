@@ -84,24 +84,19 @@
                                                     </c:choose>
                                                 </td>
                                                 <td>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="fas fa-ellipsis-v"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu">
-                                                            <li>
-                                                                <a class="dropdown-item" href="${pageContext.request.contextPath}/booking?action=detail&id=${booking.bookingId}">
-                                                                    <i class="fas fa-info-circle me-2"></i>Chi tiết
-                                                                </a>
-                                                            </li>
-                                                            <c:if test="${booking.status eq 'PENDING' || booking.status eq 'CONFIRMED'}">
-                                                                <li>
-                                                                    <a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#cancelModal${booking.bookingId}">
-                                                                        <i class="fas fa-times-circle me-2"></i>Hủy đặt vé
-                                                                    </a>
-                                                                </li>
-                                                            </c:if>
-                                                        </ul>
+                                                    <div class="d-flex gap-2">
+                                                        <a href="${pageContext.request.contextPath}/booking?action=detail&id=${booking.bookingId}" 
+                                                           class="btn btn-sm btn-outline-primary" title="Chi tiết">
+                                                            <i class="fas fa-info-circle"></i>
+                                                        </a>
+                                                        
+                                                        <c:if test="${booking.status eq 'PENDING' || booking.status eq 'CONFIRMED'}">
+                                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                                    data-bs-toggle="modal" data-bs-target="#cancelModal${booking.bookingId}" 
+                                                                    title="Hủy đặt vé">
+                                                                <i class="fas fa-times-circle"></i>
+                                                            </button>
+                                                        </c:if>
                                                     </div>
                                                     
                                                     <!-- Cancel Modal -->

@@ -258,7 +258,7 @@
                             <label class="form-label fw-bold">Phương thức thanh toán <span class="text-danger">*</span></label>
                             <div class="payment-method-container">
                                 <!-- Phương thức thanh toán: Tiền mặt khi nhận vé -->
-                                <div class="payment-method-option" data-payment-method="CASH_ON_DELIVERY">
+                                <div class="payment-method-option" data-payment-method="CASH ON DELIVERY">
                                     <div class="payment-method-radio">
                                         <input type="radio" name="payment_method_radio" id="cashOnDelivery" checked>
                                     </div>
@@ -272,7 +272,7 @@
                                 </div>
                                 
                                 <!-- Phương thức thanh toán: Ví điện tử -->
-                                <div class="payment-method-option" data-payment-method="DIGITAL_WALLET">
+                                <div class="payment-method-option" data-payment-method="DIGITAL WALLET">
                                     <div class="payment-method-radio">
                                         <input type="radio" name="payment_method_radio" id="digitalWallet">
                                     </div>
@@ -286,7 +286,7 @@
                                 </div>
                                 
                                 <!-- Phương thức thanh toán: Chuyển khoản ngân hàng -->
-                                <div class="payment-method-option" data-payment-method="BANK_TRANSFER">
+                                <div class="payment-method-option" data-payment-method="BANK TRANSFER">
                                     <div class="payment-method-radio">
                                         <input type="radio" name="payment_method_radio" id="bankTransfer">
                                     </div>
