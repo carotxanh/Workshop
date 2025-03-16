@@ -26,8 +26,10 @@ public class Flight {
         SCHEDULED,    // Đã lên lịch
         DELAYED,      // Trì hoãn
         CANCELLED,    // Đã hủy
-        COMPLETED,     // Đã hoàn thành
-        ON_TIME
+        COMPLETED,    // Đã hoàn thành
+        ON_TIME,
+        BOARDING,     // Đang lên máy bay
+        DEPARTED      // Đã khởi hành
     }
     
     // Constructors
