@@ -3,9 +3,11 @@ package com.mycompany.ticketplane.controller.admin;
 import com.mycompany.ticketplane.model.Flight;
 import com.mycompany.ticketplane.model.Flight.FlightStatus;
 import com.mycompany.ticketplane.model.User;
+import com.mycompany.ticketplane.model.Location;
 import com.mycompany.ticketplane.service.FlightService;
 import com.mycompany.ticketplane.service.SeatService;
 import com.mycompany.ticketplane.service.BookingService;
+import com.mycompany.ticketplane.service.LocationService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,12 +31,14 @@ public class FlightManagementServlet extends HttpServlet {
     private FlightService flightService;
     private SeatService seatService;
     private BookingService bookingService;
+    private LocationService locationService;
     
     @Override
     public void init() throws ServletException {
         flightService = new FlightService();
         seatService = new SeatService();
         bookingService = new BookingService();
+        locationService = new LocationService();
     }
     
     @Override
@@ -60,7 +64,7 @@ public class FlightManagementServlet extends HttpServlet {
         }
         
         switch (action) {
-            case "add":
+            case "create":
                 showAddForm(request, response);
                 break;
             case "edit":
@@ -128,7 +132,16 @@ public class FlightManagementServlet extends HttpServlet {
     
     private void showAddForm(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
+        try {
+            // Fetch all locations from the database
+            List<Location> locations = locationService.getAllLocations();
+            request.setAttribute("locations", locations);
+            
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
+        } catch (SQLException e) {
+            request.setAttribute("error", "Error loading locations: " + e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
+        }
     }
     
     private void createFlight(HttpServletRequest request, HttpServletResponse response) 
@@ -154,19 +167,38 @@ public class FlightManagementServlet extends HttpServlet {
                 priceStr == null || priceStr.trim().isEmpty() ||
                 totalSeatsStr == null || totalSeatsStr.trim().isEmpty()) {
                 
+                // Fetch all locations again to repopulate the form
+                List<Location> locations = locationService.getAllLocations();
+                request.setAttribute("locations", locations);
+                
                 request.setAttribute("error", "Please fill in all required fields");
                 request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
                 return;
             }
             
-            // Parse date and time
-            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            // Validate that origin and destination are different
+            if (origin.equals(destination)) {
+                // Fetch all locations again to repopulate the form
+                List<Location> locations = locationService.getAllLocations();
+                request.setAttribute("locations", locations);
+                
+                request.setAttribute("error", "Origin and destination cannot be the same");
+                request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
+                return;
+            }
+            
+            // Parse date and time - handle the datetime-local format (yyyy-MM-ddTHH:mm)
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
             
             Date departureDateTime = dateTimeFormat.parse(departureTimeStr);
             Date arrivalDateTime = dateTimeFormat.parse(arrivalTimeStr);
             
             // Validate departure and arrival times
             if (arrivalDateTime.before(departureDateTime)) {
+                // Fetch all locations again to repopulate the form
+                List<Location> locations = locationService.getAllLocations();
+                request.setAttribute("locations", locations);
+                
                 request.setAttribute("error", "Arrival time must be after departure time");
                 request.getRequestDispatcher("/WEB-INF/views/admin/flight-add.jsp").forward(request, response);
                 return;
@@ -190,6 +222,7 @@ public class FlightManagementServlet extends HttpServlet {
             flight.setArrivalTime(new java.sql.Timestamp(arrivalDateTime.getTime()));
             flight.setDuration(duration);
             flight.setPrice(price);
+            flight.setAvailableSeats(totalSeats);
             flight.setStatus(FlightStatus.SCHEDULED);
             
             // Save to database
@@ -289,7 +322,7 @@ public class FlightManagementServlet extends HttpServlet {
             }
             
             // Parse date and time
-            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            SimpleDateFormat dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
             
             Date departureDateTime = dateTimeFormat.parse(departureTimeStr);
             Date arrivalDateTime = dateTimeFormat.parse(arrivalTimeStr);

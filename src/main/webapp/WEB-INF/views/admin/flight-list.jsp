@@ -428,13 +428,6 @@
                                                     </c:choose>
                                                 </td>
                                                 <td class="action-buttons">
-                                                    <a href="flight-management?action=detail&id=${flight.flightId}" 
-                                                       class="btn btn-info btn-sm" 
-                                                       data-bs-toggle="tooltip" 
-                                                       data-bs-placement="top" 
-                                                       title="View Details">
-                                                        <i class="bi bi-eye-fill"></i>
-                                                    </a>
                                                     <a href="flight-management?action=edit&id=${flight.flightId}" 
                                                        class="btn btn-primary btn-sm"
                                                        data-bs-toggle="tooltip" 

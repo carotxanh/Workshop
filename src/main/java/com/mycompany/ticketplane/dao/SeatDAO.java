@@ -169,7 +169,7 @@ public class SeatDAO extends DBConnection {
     }
 
     public boolean insertSeatsForFlight(int flightId, int economySeats, int businessSeats, int firstClassSeats) throws SQLException {
-        String sql = "INSERT INTO Seat (flight_id, seat_number, class, status) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO Seat (flight_id, seat_number, seat_class, price, status) VALUES (?, ?, ?, ?, ?)";
 
         try {
             connection = getConnection();
@@ -182,7 +182,8 @@ public class SeatDAO extends DBConnection {
                 statement.setInt(1, flightId);
                 statement.setString(2, seatNumber);
                 statement.setString(3, SeatClass.ECONOMY.toString());
-                statement.setString(4, SeatStatus.AVAILABLE.toString());
+                statement.setBigDecimal(4, new java.math.BigDecimal("1500000.00")); // Default price for economy
+                statement.setString(5, SeatStatus.AVAILABLE.toString());
                 statement.addBatch();
             }
 
@@ -192,7 +193,8 @@ public class SeatDAO extends DBConnection {
                 statement.setInt(1, flightId);
                 statement.setString(2, seatNumber);
                 statement.setString(3, SeatClass.BUSINESS.toString());
-                statement.setString(4, SeatStatus.AVAILABLE.toString());
+                statement.setBigDecimal(4, new java.math.BigDecimal("2500000.00")); // Default price for business
+                statement.setString(5, SeatStatus.AVAILABLE.toString());
                 statement.addBatch();
             }
 
@@ -202,7 +204,8 @@ public class SeatDAO extends DBConnection {
                 statement.setInt(1, flightId);
                 statement.setString(2, seatNumber);
                 statement.setString(3, SeatClass.FIRST.toString());
-                statement.setString(4, SeatStatus.AVAILABLE.toString());
+                statement.setBigDecimal(4, new java.math.BigDecimal("3500000.00")); // Default price for first class
+                statement.setString(5, SeatStatus.AVAILABLE.toString());
                 statement.addBatch();
             }
 
