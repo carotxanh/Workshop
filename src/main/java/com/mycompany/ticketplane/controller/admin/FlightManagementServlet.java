@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-@WebServlet("/admin/flights/*")
+@WebServlet("/admin/flight-management")
 public class FlightManagementServlet extends HttpServlet {
     
     private FlightService flightService;
