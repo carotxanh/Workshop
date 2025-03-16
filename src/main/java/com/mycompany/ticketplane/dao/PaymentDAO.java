@@ -6,22 +6,28 @@ import com.mycompany.ticketplane.model.Payment.PaymentStatus;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class PaymentDAO {
+public class PaymentDAO extends DBConnection {
     
     public Payment findById(int paymentId) throws SQLException {
         String sql = "SELECT * FROM Payment WHERE payment_id = ?";
         
-        try (Connection conn = new DBConnection().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, paymentId);
+            resultSet = statement.executeQuery();
             
-            stmt.setInt(1, paymentId);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToPayment(rs);
-                }
+            if (resultSet.next()) {
+                return mapResultSetToPayment(resultSet);
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(PaymentDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        } finally {
+            closeResources();
         }
         
         return null;
@@ -31,16 +37,20 @@ public class PaymentDAO {
         String sql = "SELECT * FROM Payment WHERE booking_id = ? ORDER BY payment_date DESC";
         List<Payment> payments = new ArrayList<>();
         
-        try (Connection conn = new DBConnection().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, bookingId);
+            resultSet = statement.executeQuery();
             
-            stmt.setInt(1, bookingId);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    payments.add(mapResultSetToPayment(rs));
-                }
+            while (resultSet.next()) {
+                payments.add(mapResultSetToPayment(resultSet));
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(PaymentDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        } finally {
+            closeResources();
         }
         
         return payments;
@@ -51,34 +61,39 @@ public class PaymentDAO {
                 "card_number, card_name, transaction_id, refund_for, created_at, updated_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
         
-        try (Connection conn = new DBConnection().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             
-            stmt.setInt(1, payment.getBookingId());
-            stmt.setBigDecimal(2, payment.getAmount());
-            stmt.setTimestamp(3, new Timestamp(payment.getPaymentDate().getTime()));
-            stmt.setString(4, payment.getPaymentMethod());
-            stmt.setString(5, payment.getStatus().toString());
-            stmt.setString(6, payment.getCardNumber());
-            stmt.setString(7, payment.getCardName());
-            stmt.setString(8, payment.getTransactionId());
+            statement.setInt(1, payment.getBookingId());
+            statement.setBigDecimal(2, payment.getAmount());
+            statement.setTimestamp(3, new Timestamp(payment.getPaymentDate().getTime()));
+            statement.setString(4, payment.getPaymentMethod());
+            statement.setString(5, payment.getStatus().toString());
+            statement.setString(6, payment.getCardNumber());
+            statement.setString(7, payment.getCardName());
+            statement.setString(8, payment.getTransactionId());
             
             if (payment.getRefundFor() != null) {
-                stmt.setInt(9, payment.getRefundFor());
+                statement.setInt(9, payment.getRefundFor());
             } else {
-                stmt.setNull(9, Types.INTEGER);
+                statement.setNull(9, Types.INTEGER);
             }
             
-            int affectedRows = stmt.executeUpdate();
+            int affectedRows = statement.executeUpdate();
             
             if (affectedRows > 0) {
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        payment.setPaymentId(generatedKeys.getInt(1));
-                        return true;
-                    }
+                resultSet = statement.getGeneratedKeys();
+                if (resultSet.next()) {
+                    payment.setPaymentId(resultSet.getInt(1));
+                    return true;
                 }
             }
+        } catch (SQLException ex) {
+            Logger.getLogger(PaymentDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        } finally {
+            closeResources();
         }
         
         return false;
@@ -90,27 +105,33 @@ public class PaymentDAO {
                 "transaction_id = ?, refund_for = ?, updated_at = NOW() " +
                 "WHERE payment_id = ?";
         
-        try (Connection conn = new DBConnection().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try {
+            connection = getConnection();
+            statement = connection.prepareStatement(sql);
             
-            stmt.setInt(1, payment.getBookingId());
-            stmt.setBigDecimal(2, payment.getAmount());
-            stmt.setTimestamp(3, new Timestamp(payment.getPaymentDate().getTime()));
-            stmt.setString(4, payment.getPaymentMethod());
-            stmt.setString(5, payment.getStatus().toString());
-            stmt.setString(6, payment.getCardNumber());
-            stmt.setString(7, payment.getCardName());
-            stmt.setString(8, payment.getTransactionId());
+            statement.setInt(1, payment.getBookingId());
+            statement.setBigDecimal(2, payment.getAmount());
+            statement.setTimestamp(3, new Timestamp(payment.getPaymentDate().getTime()));
+            statement.setString(4, payment.getPaymentMethod());
+            statement.setString(5, payment.getStatus().toString());
+            statement.setString(6, payment.getCardNumber());
+            statement.setString(7, payment.getCardName());
+            statement.setString(8, payment.getTransactionId());
             
             if (payment.getRefundFor() != null) {
-                stmt.setInt(9, payment.getRefundFor());
+                statement.setInt(9, payment.getRefundFor());
             } else {
-                stmt.setNull(9, Types.INTEGER);
+                statement.setNull(9, Types.INTEGER);
             }
             
-            stmt.setInt(10, payment.getPaymentId());
+            statement.setInt(10, payment.getPaymentId());
             
-            return stmt.executeUpdate() > 0;
+            return statement.executeUpdate() > 0;
+        } catch (SQLException ex) {
+            Logger.getLogger(PaymentDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
+        } finally {
+            closeResources();
         }
     }
     

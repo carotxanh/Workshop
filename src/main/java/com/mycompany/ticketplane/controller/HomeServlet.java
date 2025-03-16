@@ -2,6 +2,8 @@ package com.mycompany.ticketplane.controller;
 
 import com.mycompany.ticketplane.dao.FlightDAO;
 import com.mycompany.ticketplane.model.Flight;
+import com.mycompany.ticketplane.model.Location;
+import com.mycompany.ticketplane.service.FlightService;
 import com.mycompany.ticketplane.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,40 +15,45 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebServlet(name = "HomeServlet", urlPatterns = {"", "/home"})
 public class HomeServlet extends HttpServlet {
 
-    private FlightDAO flightDAO;
+    private FlightService flightService;
     
     @Override
     public void init() {
-        flightDAO = new FlightDAO();
+        flightService = new FlightService();
     }
     
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
         try {
-            // Lấy danh sách các chuyến bay sắp tới để hiển thị trên trang chủ
-            List<Flight> upcomingFlights = flightDAO.getUpcomingFlights();
+            // Lấy danh sách các chuyến bay sắp tới
+            List<Flight> upcomingFlights = flightService.getUpcomingFlights();
             request.setAttribute("upcomingFlights", upcomingFlights);
+            
+            // Lấy danh sách các điểm khởi hành và điểm đến
+            List<Location> origins = flightService.getAllOrigins();
+            List<Location> destinations = flightService.getAllDestinations();
+            
+            request.setAttribute("origins", origins);
+            request.setAttribute("destinations", destinations);
             
             // Lấy thông tin người dùng từ session (nếu đã đăng nhập)
             HttpSession session = request.getSession();
             User user = (User) session.getAttribute("user");
-            
             if (user != null) {
                 request.setAttribute("userName", user.getName());
             }
             
-            // Forward đến trang home.jsp
             request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
-            
-        } catch (SQLException e) {
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() + "/error");
+        } catch (SQLException ex) {
+            Logger.getLogger(HomeServlet.class.getName()).log(Level.SEVERE, null, ex);
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Database error occurred");
         }
     }
     

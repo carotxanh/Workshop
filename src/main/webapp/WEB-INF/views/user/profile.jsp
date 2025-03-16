@@ -9,19 +9,28 @@
     <h2>Hồ sơ người dùng</h2>
 </div>
 
-<c:if test="${not empty successMessage}">
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        ${successMessage}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<!-- Toast container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>
+                <span id="successToastMessage"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
     </div>
-</c:if>
-
-<c:if test="${not empty errorMessage}">
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        ${errorMessage}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="errorToastMessage"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
     </div>
-</c:if>
+</div>
 
 <div class="row">
     <div class="col-lg-4">
@@ -74,23 +83,29 @@
                 <h6 class="m-0 font-weight-bold text-primary">Cập nhật thông tin</h6>
             </div>
             <div class="card-body">
-                <form action="${pageContext.request.contextPath}/profileController" method="post" id="profileForm">
+                <form action="${pageContext.request.contextPath}/profileController" method="post" id="profileForm" novalidate>
                     <input type="hidden" name="action" value="updateProfile">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="name" class="form-label">Họ và tên <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="name" name="name" value="${user.name}" required>
+                            <input type="text" class="form-control" id="name" name="name" value="${user.name}"  
+                                   pattern=".{3,50}" title="Họ và tên phải có từ 3 đến 50 ký tự">
+                            <div class="invalid-feedback">Vui lòng nhập họ và tên (3-50 ký tự)</div>
                         </div>
                         <div class="col-md-6">
                             <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="email" name="email" value="${user.email}" required>
+                            <input type="email" class="form-control" id="email" name="email" value="${user.email}" 
+                                   pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" title="Vui lòng nhập email hợp lệ">
+                            <div class="invalid-feedback">Vui lòng nhập email hợp lệ</div>
                         </div>
                     </div>
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="phone" class="form-label">Số điện thoại</label>
-                            <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}">
+                            <input type="text" class="form-control" id="phone" name="phone" value="${user.phone}"
+                                   pattern="(0|\+84)[0-9]{9,10}" title="Số điện thoại phải bắt đầu bằng 0 hoặc +84 và có 10-11 số">
+                            <div class="invalid-feedback">Số điện thoại không hợp lệ</div>
                         </div>
                     </div>
                     
@@ -108,22 +123,26 @@
                 <h6 class="m-0 font-weight-bold text-primary">Đổi mật khẩu</h6>
             </div>
             <div class="card-body">
-                <form action="${pageContext.request.contextPath}/profileController" method="post" id="passwordForm">
+                <form action="${pageContext.request.contextPath}/profileController" method="post" id="passwordForm" novalidate>
                     <input type="hidden" name="action" value="changePassword">
                     <div class="mb-3">
                         <label for="currentPassword" class="form-label">Mật khẩu hiện tại <span class="text-danger">*</span></label>
                         <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                        <div class="invalid-feedback">Vui lòng nhập mật khẩu hiện tại</div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="newPassword" class="form-label">Mật khẩu mới <span class="text-danger">*</span></label>
-                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required
+                               pattern=".{8,}" title="Mật khẩu phải có ít nhất 8 ký tự">
                         <div class="form-text">Mật khẩu phải có ít nhất 8 ký tự.</div>
+                        <div class="invalid-feedback">Mật khẩu phải có ít nhất 8 ký tự</div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="confirmPassword" class="form-label">Xác nhận mật khẩu mới <span class="text-danger">*</span></label>
                         <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                        <div class="invalid-feedback">Mật khẩu xác nhận không khớp</div>
                     </div>
                     
                     <div class="d-flex justify-content-end">
@@ -145,13 +164,14 @@
                 <h5 class="modal-title" id="uploadAvatarModalLabel">Thay đổi ảnh đại diện</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="${pageContext.request.contextPath}/profileController" method="post" enctype="multipart/form-data">
+            <form action="${pageContext.request.contextPath}/profileController" method="post" enctype="multipart/form-data" id="avatarForm" novalidate>
                 <input type="hidden" name="action" value="uploadAvatar">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="avatarFile" class="form-label">Chọn ảnh</label>
                         <input class="form-control" type="file" id="avatarFile" name="avatarFile" accept="image/*" required>
                         <div class="form-text">Chỉ chấp nhận file ảnh (JPG, PNG, GIF). Kích thước tối đa 2MB.</div>
+                        <div class="invalid-feedback">Vui lòng chọn file ảnh</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -165,22 +185,95 @@
 
 <script>
 $(document).ready(function() {
+    // Hiển thị toast nếu có thông báo
+    <c:if test="${not empty successMessage}">
+        $('#successToastMessage').text("${successMessage}");
+        var successToast = new bootstrap.Toast(document.getElementById('successToast'));
+        successToast.show();
+    </c:if>
+    
+    <c:if test="${not empty errorMessage}">
+        $('#errorToastMessage').text("${errorMessage}");
+        var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+        errorToast.show();
+    </c:if>
+    
+    // Validate form cập nhật thông tin
+    $('#profileForm').submit(function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).addClass('was-validated');
+            $('#errorToastMessage').text("Vui lòng kiểm tra lại thông tin đã nhập");
+            var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            errorToast.show();
+            return false;
+        }
+        $(this).addClass('was-validated');
+        return true;
+    });
+    
+    // Validate form đổi mật khẩu
     $('#passwordForm').submit(function(e) {
+        const currentPassword = $('#currentPassword').val();
         const newPassword = $('#newPassword').val();
         const confirmPassword = $('#confirmPassword').val();
         
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            e.preventDefault();
+            $(this).addClass('was-validated');
+            $('#errorToastMessage').text("Vui lòng nhập đầy đủ thông tin");
+            var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            errorToast.show();
+            return false;
+        }
+        
         if (newPassword.length < 8) {
             e.preventDefault();
-            alert('Mật khẩu phải có ít nhất 8 ký tự.');
+            $('#newPassword').addClass('is-invalid');
+            $('#errorToastMessage').text("Mật khẩu phải có ít nhất 8 ký tự");
+            var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            errorToast.show();
             return false;
         }
         
         if (newPassword !== confirmPassword) {
             e.preventDefault();
-            alert('Mật khẩu và xác nhận mật khẩu không khớp.');
+            $('#confirmPassword').addClass('is-invalid');
+            $('#errorToastMessage').text("Mật khẩu và xác nhận mật khẩu không khớp");
+            var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            errorToast.show();
             return false;
         }
         
+        $(this).addClass('was-validated');
+        return true;
+    });
+    
+    // Validate form upload avatar
+    $('#avatarForm').submit(function(e) {
+        const avatarFile = $('#avatarFile').val();
+        
+        if (!avatarFile) {
+            e.preventDefault();
+            $(this).addClass('was-validated');
+            $('#errorToastMessage').text("Vui lòng chọn file ảnh");
+            var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            errorToast.show();
+            return false;
+        }
+        
+        const fileExtension = avatarFile.substring(avatarFile.lastIndexOf('.')).toLowerCase();
+        if (fileExtension !== '.jpg' && fileExtension !== '.jpeg' && fileExtension !== '.png' && fileExtension !== '.gif') {
+            e.preventDefault();
+            $('#avatarFile').addClass('is-invalid');
+            $('#errorToastMessage').text("Chỉ chấp nhận file ảnh (JPG, PNG, GIF)");
+            var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+            errorToast.show();
+            return false;
+        }
+        
+        $(this).addClass('was-validated');
         return true;
     });
 });

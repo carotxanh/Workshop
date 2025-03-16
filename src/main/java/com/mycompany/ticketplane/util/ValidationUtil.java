@@ -14,10 +14,8 @@ public class ValidationUtil {
      * @return true nếu hợp lệ, false nếu không hợp lệ
      */
     public static boolean isValidEmail(String email) {
-        if (email == null || email.trim().isEmpty()) {
-            return false;
-        }
-        return EMAIL_PATTERN.matcher(email).matches();
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        return email.matches(emailRegex);
     }
     
     /**
@@ -26,10 +24,8 @@ public class ValidationUtil {
      * @return true nếu hợp lệ, false nếu không hợp lệ
      */
     public static boolean isValidPhone(String phone) {
-        if (phone == null || phone.trim().isEmpty()) {
-            return false;
-        }
-        return PHONE_PATTERN.matcher(phone).matches();
+        String phoneRegex = "(0|\\+84)[0-9]{9,10}";
+        return phone.matches(phoneRegex);
     }
     
     /**

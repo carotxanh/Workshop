@@ -37,22 +37,16 @@ public class UserService {
     }
     
     public boolean register(String name, String email, String password, String phone) throws SQLException {
-        try {
-            if (userDAO.checkEmailExists(email)) {
-                return false;
-            }
-            
-            User user = new User();
-            user.setName(name);
-            user.setEmail(email);
-            user.setPassword(passwordUtil.hashPassword(password));
-            user.setPhone(phone);
-            user.setRole(UserRole.USER);
-            
-            return userDAO.insert(user);
-        } catch (SQLException e) {
-            throw new SQLException("Error during registration: " + e.getMessage(), e);
+        if (userDAO.checkEmailExists(email)) {
+            return false;
         }
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordUtil.hashPassword(password));
+        user.setPhone(phone);
+        user.setRole(UserRole.USER);
+        return userDAO.insert(user);
     }
     
     public boolean updateProfile(int userId, String name, String email, String phone) throws SQLException {
@@ -128,5 +122,36 @@ public class UserService {
             return userDAO.update(user);
         }
         return false;
+    }
+    
+    /**
+     * Lấy số lượng người dùng mới theo tháng và năm
+     * @param month Tháng (1-12)
+     * @param year Năm
+     * @return Số lượng người dùng mới trong tháng
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public int getNewUserCountByMonth(int month, int year) throws SQLException {
+        return userDAO.getNewUserCountByMonth(month, year);
+    }
+    
+    /**
+     * Lấy số lượng người dùng theo vai trò
+     * @param role Vai trò người dùng
+     * @return Số lượng người dùng theo vai trò
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public int getUserCountByRole(String role) throws SQLException {
+        return userDAO.getUserCountByRole(role);
+    }
+    
+    /**
+     * Lấy danh sách người dùng mới nhất
+     * @param limit Số lượng người dùng cần lấy
+     * @return Danh sách người dùng mới nhất
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<User> getRecentUsers(int limit) throws SQLException {
+        return userDAO.getRecentUsers(limit);
     }
 } 

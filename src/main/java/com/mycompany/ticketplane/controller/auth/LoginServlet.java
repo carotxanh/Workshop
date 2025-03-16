@@ -14,14 +14,14 @@ import java.sql.SQLException;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-    
+
     private UserService userService;
-    
+
     @Override
     public void init() throws ServletException {
         userService = new UserService();
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Kiểm tra nếu người dùng đã đăng nhập
@@ -30,29 +30,24 @@ public class LoginServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
-        
+
         request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        
+
         try {
             User user = userService.login(email, password);
-            
+
             if (user != null) {
                 // Đăng nhập thành công
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
-                
-                // Chuyển hướng dựa vào vai trò
-                if (user.getRole() == User.UserRole.ADMIN) {
-                    response.sendRedirect(request.getContextPath() + "/admin/dashboard");
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/");
-                }
+
+                response.sendRedirect(request.getContextPath() + "/home");
             } else {
                 // Đăng nhập thất bại
                 request.setAttribute("error", "Email hoặc mật khẩu không đúng");
@@ -63,4 +58,4 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
         }
     }
-} 
+}

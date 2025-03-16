@@ -1,32 +1,32 @@
 package com.mycompany.ticketplane.model;
 
-import java.sql.Timestamp;
+import java.math.BigDecimal;
 
 public class Seat {
     private Integer seatId;
     private Integer flightId;
     private String seatNumber;
     private SeatClass seatClass;
+    private BigDecimal price;
     private SeatStatus status;
-    private Timestamp createdAt;
-    private Timestamp updatedAt;
     
     public enum SeatClass {
-        ECONOMY, BUSINESS, FIRST_CLASS
+        ECONOMY, BUSINESS, FIRST
     }
     
     public enum SeatStatus {
-        AVAILABLE, BOOKED
+        AVAILABLE, BOOKED, RESERVED
     }
     
     // Constructors
     public Seat() {}
     
-    public Seat(Integer seatId, Integer flightId, String seatNumber, SeatClass seatClass, SeatStatus status) {
+    public Seat(Integer seatId, Integer flightId, String seatNumber, SeatClass seatClass, BigDecimal price, SeatStatus status) {
         this.seatId = seatId;
         this.flightId = flightId;
         this.seatNumber = seatNumber;
         this.seatClass = seatClass;
+        this.price = price;
         this.status = status;
     }
     
@@ -63,28 +63,20 @@ public class Seat {
         this.seatClass = seatClass;
     }
     
+    public BigDecimal getPrice() {
+        return price;
+    }
+    
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+    
     public SeatStatus getStatus() {
         return status;
     }
     
     public void setStatus(SeatStatus status) {
         this.status = status;
-    }
-    
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-    
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-    
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-    
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
     }
     
     @Override
@@ -94,6 +86,7 @@ public class Seat {
                 ", flightId=" + flightId +
                 ", seatNumber='" + seatNumber + '\'' +
                 ", seatClass=" + seatClass +
+                ", price=" + price +
                 ", status=" + status +
                 '}';
     }

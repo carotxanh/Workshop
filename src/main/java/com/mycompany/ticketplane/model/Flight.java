@@ -21,7 +21,11 @@ public class Flight {
     private Timestamp updatedAt;
     
     public enum FlightStatus {
-        ON_TIME, DELAYED, CANCELLED
+        SCHEDULED,    // Đã lên lịch
+        DELAYED,      // Trì hoãn
+        CANCELLED,    // Đã hủy
+        COMPLETED,     // Đã hoàn thành
+        ON_TIME
     }
     
     // Constructors

@@ -9,23 +9,36 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DBConnection {
+
     protected Connection connection;
     protected ResultSet resultSet;
     protected PreparedStatement statement;
 
     public DBConnection() {
+        // Không tạo kết nối trong constructor
+    }
+
+    /**
+     * Lấy kết nối mới đến cơ sở dữ liệu
+     *
+     * @return Kết nối đến cơ sở dữ liệu
+     */
+    public Connection getConnection() {
         try {
-            // Change these values to match your database configuration
-            String username = "root";
-            String password = "123456";
-            String url = "jdbc:mysql://localhost:3306/ticketplane";
+            String username = "root"; // Thay đổi theo cấu hình của bạn
+            String password = "123456"; // Thay đổi theo cấu hình của bạn
+            String url = "jdbc:mysql://localhost:3306/ticketplane_2"; // Thay đổi theo cấu hình của bạn
             Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(url, username, password);
+            return DriverManager.getConnection(url, username, password);
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
     }
-    
+
+    /**
+     * Đóng tất cả các tài nguyên cơ sở dữ liệu
+     */
     public void closeResources() {
         try {
             if (resultSet != null && !resultSet.isClosed()) {
@@ -42,11 +55,7 @@ public class DBConnection {
         }
     }
 
-    public Connection getConnection() {
-        return new DBConnection().connection;
-    }
-    
     public static void main(String[] args) {
         System.out.println(new DBConnection().connection);
     }
-} 
+}

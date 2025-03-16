@@ -4,6 +4,7 @@ import com.mycompany.ticketplane.dao.FlightDAO;
 import com.mycompany.ticketplane.dao.SeatDAO;
 import com.mycompany.ticketplane.model.Flight;
 import com.mycompany.ticketplane.model.Flight.FlightStatus;
+import com.mycompany.ticketplane.model.Location;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -101,11 +102,115 @@ public class FlightService {
         return flightDAO.delete(flightId);
     }
     
+    /**
+     * Lấy danh sách các chuyến bay sắp tới
+     * @return Danh sách các chuyến bay sắp tới
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
     public List<Flight> getUpcomingFlights() throws SQLException {
-        return flightDAO.getUpcomingFlights();
+        // Mặc định lấy 5 chuyến bay sắp tới
+        return flightDAO.getUpcomingFlights(5);
+    }
+
+    /**
+     * Lấy danh sách các chuyến bay sắp tới với số lượng giới hạn
+     * @param limit Số lượng chuyến bay tối đa cần lấy
+     * @return Danh sách các chuyến bay sắp tới
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<Flight> getUpcomingFlights(int limit) throws SQLException {
+        return flightDAO.getUpcomingFlights(limit);
     }
     
     public boolean updateAvailableSeats(int flightId, int change) throws SQLException {
         return flightDAO.updateAvailableSeats(flightId, change);
+    }
+    
+    /**
+     * Lấy số lượng chuyến bay theo trạng thái
+     * @param status Trạng thái chuyến bay
+     * @return Số lượng chuyến bay theo trạng thái
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public int getFlightCountByStatus(String status) throws SQLException {
+        return flightDAO.getFlightCountByStatus(status);
+    }
+
+    /**
+     * Lấy danh sách các chuyến bay có sẵn
+     * @return Danh sách các chuyến bay có sẵn
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<Flight> findAvailableFlights() throws SQLException {
+        return flightDAO.findAvailableFlights();
+    }
+
+    /**
+     * Lấy danh sách tất cả các điểm khởi hành
+     * @return Danh sách các điểm khởi hành
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<Location> getAllOrigins() throws SQLException {
+        return flightDAO.getAllOrigins();
+    }
+
+    /**
+     * Lấy danh sách tất cả các điểm đến
+     * @return Danh sách các điểm đến
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<Location> getAllDestinations() throws SQLException {
+        return flightDAO.getAllDestinations();
+    }
+
+    /**
+     * Lấy tất cả các chuyến bay
+     * @return Danh sách tất cả các chuyến bay
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<Flight> getAllFlights() throws SQLException {
+        return flightDAO.findAll();
+    }
+
+    /**
+     * Tạo chuyến bay mới
+     * @param flight Đối tượng Flight cần tạo
+     * @return true nếu tạo thành công, false nếu thất bại
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public boolean createFlight(Flight flight) throws SQLException {
+        return flightDAO.insert(flight);
+    }
+
+    /**
+     * Cập nhật thông tin chuyến bay
+     * @param flight Đối tượng Flight cần cập nhật
+     * @return true nếu cập nhật thành công, false nếu thất bại
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public boolean updateFlight(Flight flight) throws SQLException {
+        return flightDAO.update(flight);
+    }
+
+    /**
+     * Lấy thông tin chi tiết của chuyến bay
+     * @param flightId ID của chuyến bay cần lấy thông tin
+     * @return Đối tượng Flight chứa thông tin chi tiết
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public Flight getFlightDetail(int flightId) throws SQLException {
+        return flightDAO.findById(flightId);
+    }
+
+    /**
+     * Tìm kiếm chuyến bay theo điều kiện
+     * @param origin Điểm khởi hành
+     * @param destination Điểm đến
+     * @param departureDate Ngày khởi hành
+     * @return Danh sách các chuyến bay thỏa mãn điều kiện
+     * @throws SQLException Nếu có lỗi truy vấn cơ sở dữ liệu
+     */
+    public List<Flight> searchFlights(String origin, String destination, java.sql.Date departureDate) throws SQLException {
+        return flightDAO.searchFlights(origin, destination, departureDate);
     }
 } 

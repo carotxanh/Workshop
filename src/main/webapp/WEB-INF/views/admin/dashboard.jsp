@@ -5,12 +5,43 @@
     <jsp:param name="title" value="Bảng điều khiển" />
 </jsp:include>
 
+<!-- Toast container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1050">
+    <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-check-circle me-2"></i>
+                <span id="successToastMessage"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+    
+    <div id="errorToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="errorToastMessage"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">Bảng điều khiển</h1>
-    <a href="${pageContext.request.contextPath}/admin/reports/download" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-        <i class="fas fa-download fa-sm text-white-50 me-2"></i>Tải báo cáo
-    </a>
+    <div>
+        <a href="${pageContext.request.contextPath}/admin/dashboard/filter" class="btn btn-sm btn-primary shadow-sm me-2">
+            <i class="fas fa-filter fa-sm text-white-50 me-2"></i>Lọc dữ liệu
+        </a>
+        <a href="${pageContext.request.contextPath}/admin/reports" class="btn btn-sm btn-primary shadow-sm me-2">
+            <i class="fas fa-file-alt fa-sm text-white-50 me-2"></i>Tạo báo cáo
+        </a>
+        <a href="${pageContext.request.contextPath}/admin/reports/download" class="btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-download fa-sm text-white-50 me-2"></i>Tải báo cáo
+        </a>
+    </div>
 </div>
 
 <!-- Content Row -->
@@ -109,7 +140,7 @@
     <div class="col-xl-8 col-lg-7">
         <div class="card shadow mb-4">
             <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Tổng quan doanh thu</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Doanh thu theo tháng</h6>
                 <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -118,10 +149,10 @@
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                         aria-labelledby="dropdownMenuLink">
                         <div class="dropdown-header">Tùy chọn:</div>
-                        <a class="dropdown-item" href="#">Xuất báo cáo</a>
-                        <a class="dropdown-item" href="#">Xem chi tiết</a>
+                        <a class="dropdown-item" href="${pageContext.request.contextPath}/admin/dashboard?action=viewRevenue">Xem chi tiết</a>
+                        <a class="dropdown-item" href="${pageContext.request.contextPath}/admin/reports?type=revenue">Tạo báo cáo</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Cài đặt</a>
+                        <a class="dropdown-item" href="${pageContext.request.contextPath}/admin/dashboard/filter">Lọc dữ liệu</a>
                     </div>
                 </div>
             </div>
@@ -146,10 +177,10 @@
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                         aria-labelledby="dropdownMenuLink">
                         <div class="dropdown-header">Tùy chọn:</div>
-                        <a class="dropdown-item" href="#">Xuất báo cáo</a>
-                        <a class="dropdown-item" href="#">Xem chi tiết</a>
+                        <a class="dropdown-item" href="${pageContext.request.contextPath}/admin/dashboard?action=viewBookings">Xem chi tiết</a>
+                        <a class="dropdown-item" href="${pageContext.request.contextPath}/admin/reports?type=bookings">Tạo báo cáo</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Cài đặt</a>
+                        <a class="dropdown-item" href="${pageContext.request.contextPath}/admin/dashboard/filter">Lọc dữ liệu</a>
                     </div>
                 </div>
             </div>
@@ -158,13 +189,13 @@
                     <canvas id="bookingDistributionChart"></canvas>
                 </div>
                 <div class="mt-4 text-center small">
-                    <span class="mr-2">
+                    <span class="me-2">
                         <i class="fas fa-circle text-primary"></i> Phổ thông
                     </span>
-                    <span class="mr-2">
+                    <span class="me-2">
                         <i class="fas fa-circle text-success"></i> Thương gia
                     </span>
-                    <span class="mr-2">
+                    <span class="me-2">
                         <i class="fas fa-circle text-info"></i> Hạng nhất
                     </span>
                 </div>
@@ -173,120 +204,29 @@
     </div>
 </div>
 
-<!-- Content Row -->
-<div class="row">
-    <!-- Chuyến bay sắp tới -->
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Chuyến bay sắp tới</h6>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered" width="100%" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>Mã chuyến bay</th>
-                                <th>Từ - Đến</th>
-                                <th>Thời gian</th>
-                                <th>Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach items="${upcomingFlights}" var="flight">
-                                <tr>
-                                    <td>${flight.flightNumber}</td>
-                                    <td>${flight.origin} - ${flight.destination}</td>
-                                    <td><fmt:formatDate value="${flight.departureTime}" pattern="dd/MM/yyyy HH:mm" /></td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${flight.status eq 'SCHEDULED'}">
-                                                <span class="badge bg-success">Đã lên lịch</span>
-                                            </c:when>
-                                            <c:when test="${flight.status eq 'DELAYED'}">
-                                                <span class="badge bg-warning">Trì hoãn</span>
-                                            </c:when>
-                                            <c:when test="${flight.status eq 'CANCELLED'}">
-                                                <span class="badge bg-danger">Đã hủy</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="badge bg-secondary">${flight.status}</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
-                <a href="${pageContext.request.contextPath}/admin/flights" class="btn btn-primary btn-sm">
-                    Xem tất cả chuyến bay
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Đặt vé gần đây -->
-    <div class="col-lg-6 mb-4">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Đặt vé gần đây</h6>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-bordered" width="100%" cellspacing="0">
-                        <thead>
-                            <tr>
-                                <th>Mã đặt vé</th>
-                                <th>Khách hàng</th>
-                                <th>Ngày đặt</th>
-                                <th>Tổng tiền</th>
-                                <th>Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach items="${recentBookings}" var="booking">
-                                <tr>
-                                    <td>${booking.bookingCode}</td>
-                                    <td>${booking.user.fullName}</td>
-                                    <td><fmt:formatDate value="${booking.bookingDate}" pattern="dd/MM/yyyy" /></td>
-                                    <td><fmt:formatNumber value="${booking.totalAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${booking.status eq 'CONFIRMED'}">
-                                                <span class="badge bg-success">Đã xác nhận</span>
-                                            </c:when>
-                                            <c:when test="${booking.status eq 'PENDING'}">
-                                                <span class="badge bg-warning">Đang chờ</span>
-                                            </c:when>
-                                            <c:when test="${booking.status eq 'CANCELLED'}">
-                                                <span class="badge bg-danger">Đã hủy</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="badge bg-secondary">${booking.status}</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
-                </div>
-                <a href="${pageContext.request.contextPath}/admin/bookings" class="btn btn-primary btn-sm">
-                    Xem tất cả đặt vé
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+$(document).ready(function() {
+    // Hiển thị thông báo thành công/lỗi
+    <c:if test="${not empty successMessage}">
+        $('#successToastMessage').text("${successMessage}");
+        var successToast = new bootstrap.Toast(document.getElementById('successToast'));
+        successToast.show();
+    </c:if>
+    
+    <c:if test="${not empty errorMessage}">
+        $('#errorToastMessage').text("${errorMessage}");
+        var errorToast = new bootstrap.Toast(document.getElementById('errorToast'));
+        errorToast.show();
+    </c:if>
+});
+
 // Biểu đồ doanh thu
 var ctx = document.getElementById("revenueChart");
-var revenueChart = new Chart(ctx, {
+var myLineChart = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: ${revenueChartLabels},
+        labels: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"],
         datasets: [{
             label: "Doanh thu",
             lineTension: 0.3,
@@ -300,7 +240,19 @@ var revenueChart = new Chart(ctx, {
             pointHoverBorderColor: "rgba(78, 115, 223, 1)",
             pointHitRadius: 10,
             pointBorderWidth: 2,
-            data: ${revenueChartData},
+            data: [
+                <c:forEach var="i" begin="1" end="12">
+                    <c:set var="monthKey" value="Tháng ${i}" />
+                    <c:choose>
+                        <c:when test="${revenueChartData[monthKey] != null}">
+                            ${revenueChartData[monthKey]}<c:if test="${i < 12}">,</c:if>
+                        </c:when>
+                        <c:otherwise>
+                            0<c:if test="${i < 12}">,</c:if>
+                        </c:otherwise>
+                    </c:choose>
+                </c:forEach>
+            ],
         }],
     },
     options: {
@@ -330,7 +282,6 @@ var revenueChart = new Chart(ctx, {
                 ticks: {
                     maxTicksLimit: 5,
                     padding: 10,
-                    // Include a dollar sign in the ticks
                     callback: function(value, index, values) {
                         return number_format(value) + ' ₫';
                     }
@@ -378,7 +329,15 @@ var bookingDistributionChart = new Chart(ctx2, {
     data: {
         labels: ["Phổ thông", "Thương gia", "Hạng nhất"],
         datasets: [{
-            data: [${economyBookings}, ${businessBookings}, ${firstClassBookings}],
+            data: [
+                <c:forEach var="entry" items="${bookingsByClass}">
+                    <c:choose>
+                        <c:when test="${entry.key eq 'Phổ thông'}">${entry.value},</c:when>
+                        <c:when test="${entry.key eq 'Thương gia'}">${entry.value},</c:when>
+                        <c:when test="${entry.key eq 'Hạng nhất'}">${entry.value}</c:when>
+                    </c:choose>
+                </c:forEach>
+            ],
             backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
             hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
             hoverBorderColor: "rgba(234, 236, 244, 1)",
