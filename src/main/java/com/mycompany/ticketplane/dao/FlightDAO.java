@@ -168,7 +168,7 @@ public class FlightDAO extends DBConnection {
      * @return true nếu cập nhật thành công, false nếu thất bại
      */
     public boolean updateAvailableSeats(int flightId, int change) {
-        String sql = "UPDATE flights SET available_seats = available_seats + ? WHERE flight_id = ?";
+        String sql = "UPDATE Flight SET available_seats = available_seats + ? WHERE flight_id = ?";
         
         Connection conn = null;
         PreparedStatement stmt = null;
