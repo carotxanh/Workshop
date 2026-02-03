@@ -12,11 +12,11 @@
                 <form action="${pageContext.request.contextPath}/login" method="post">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="a@gmail.com" required>
+                        <input type="email" class="form-control" id="email" name="email" value="" required>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Mật khẩu</label>
-                        <input type="password" class="form-control" id="password" name="password" value="Edison@28" required>
+                        <input type="password" class="form-control" id="password" name="password" value="" required>
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">Đăng nhập</button>

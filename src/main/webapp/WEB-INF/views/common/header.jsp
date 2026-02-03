@@ -39,9 +39,11 @@
                             <li class="nav-item">
                                 <a class="nav-link" href="${pageContext.request.contextPath}/profileController">Trang cá nhân</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="${pageContext.request.contextPath}/admin/booking-management">Quản trị</a>
-                            </li>
+                            <c:if test="${sessionScope.user.role == 'ADMIN'}">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/admin/booking-management">Quản trị</a>
+                                </li>
+                            </c:if>
                         </c:if>
                     </ul>
                     <ul class="navbar-nav">
@@ -70,6 +72,10 @@
                                         <li><a class="dropdown-item" href="${pageContext.request.contextPath}/logout">Đăng xuất</a></li>
                                     </ul>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="${pageContext.request.contextPath}/logout">Đăng xuất</a>
+                                </li>
+
                             </c:otherwise>
                         </c:choose>
                     </ul>

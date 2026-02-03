@@ -26,7 +26,7 @@ public class DBConnection {
     public Connection getConnection() {
         try {
             String username = "root"; // Thay đổi theo cấu hình của bạn
-            String password = "123456"; // Thay đổi theo cấu hình của bạn
+            String password = "123456789"; // Thay đổi theo cấu hình của bạn
             String url = "jdbc:mysql://localhost:3306/ticketplane_2"; // Thay đổi theo cấu hình của bạn
             Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(url, username, password);
