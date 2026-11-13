@@ -1,221 +1,179 @@
-# Hệ thống đặt vé máy bay
+# Airline Ticket Booking System
 
-Hệ thống đặt vé máy bay là một ứng dụng web Java cho phép người dùng tìm kiếm, đặt và thanh toán vé máy bay trực tuyến.
+A Java web application for searching flights, booking seats, managing reservations, and processing payments online.
 
-## Tính năng
+## Features
 
-- Đăng ký, đăng nhập và quản lý tài khoản người dùng
-- Tìm kiếm chuyến bay theo điểm khởi hành, điểm đến và ngày bay
-- Xem chi tiết chuyến bay và chọn ghế
-- Đặt vé và thanh toán trực tuyến
-- Xem lịch sử đặt vé và hủy vé
-- Tạo và tải xuống vé điện tử dạng PDF
-- Gửi email xác nhận đặt vé và thanh toán
+- User registration, login, and account management
+- Flight search by origin, destination, and travel date
+- Flight details and seat selection
+- Ticket booking and payment processing
+- Booking history and cancellation
+- PDF e-ticket generation and download
+- Booking and payment confirmation emails
 
-## Công nghệ sử dụng
+## Technology Stack
 
-- Java Servlet và JSP
+- Java Servlets and JSP
 - MySQL
-- HTML, CSS, JavaScript
+- HTML, CSS, and JavaScript
 - Bootstrap
-- iText (tạo PDF)
-- JavaMail (gửi email)
+- iText for PDF generation
+- JavaMail for email delivery
 
-## Cài đặt
+## Setup
 
-1. Clone repository
-2. Import project vào Eclipse hoặc IntelliJ IDEA
-3. Cấu hình Tomcat server
-4. Tạo cơ sở dữ liệu MySQL và import file sql.sql
-5. Cấu hình kết nối cơ sở dữ liệu trong file DBConnection.java
-6. Cấu hình email trong file mail.properties
-7. Chạy ứng dụng
+1. Clone this repository.
+2. Import the project into Eclipse or IntelliJ IDEA as a Maven project.
+3. Configure a Tomcat server.
+4. Create a MySQL database and import `sql.sql`.
+5. Configure the database connection in `src/main/resources/db.properties`.
+6. Configure email settings in `src/main/resources/mail.properties`.
+7. Build and run the application on Tomcat.
 
-## Cấu trúc dự án
+> Update the database and email settings for your environment before running the application. Do not commit credentials.
 
-### Actor trong hệ thống
+## Project Structure
 
-1. Khách hàng (Customer) – Người dùng mua vé máy bay trực tuyến.
-2. Nhân viên (Staff/Admin) – Quản lý thông tin chuyến bay, đơn hàng, khách hàng.
-3. Hệ thống thanh toán (Payment Gateway) – Xử lý thanh toán vé máy bay.
-4. Hệ thống hãng hàng không (Airline System) – Cung cấp dữ liệu về chuyến bay, tình trạng ghế, hủy chuyến.
-5. Hệ thống thông báo (Notification System) – Gửi email, SMS xác nhận đặt vé.
+The tree below reflects the files currently present in the repository. It is formatted as a fenced code block so GitHub preserves the indentation and tree characters.
 
----
+```text
+Workshop/
+├── src/
+│   └── main/
+│       ├── java/com/mycompany/ticketplane/
+│       │   ├── controller/
+│       │   │   ├── admin/
+│       │   │   │   ├── BookingManagement.java
+│       │   │   │   ├── FlightManagementServlet.java
+│       │   │   │   └── UserManagement.java
+│       │   │   ├── auth/
+│       │   │   │   ├── LoginServlet.java
+│       │   │   │   └── RegisterServlet.java
+│       │   │   ├── booking/
+│       │   │   │   └── BookingServlet.java
+│       │   │   ├── user/
+│       │   │   │   ├── ProfileController.java
+│       │   │   │   └── UserBookingsServlet.java
+│       │   │   ├── HomeServlet.java
+│       │   │   └── LogoutServlet.java
+│       │   ├── dao/
+│       │   │   ├── BookingDAO.java
+│       │   │   ├── DBConnection.java
+│       │   │   ├── FlightDAO.java
+│       │   │   ├── LocationDAO.java
+│       │   │   ├── PaymentDAO.java
+│       │   │   ├── SeatDAO.java
+│       │   │   └── UserDAO.java
+│       │   ├── model/
+│       │   │   ├── Booking.java
+│       │   │   ├── Flight.java
+│       │   │   ├── Location.java
+│       │   │   ├── Payment.java
+│       │   │   ├── Seat.java
+│       │   │   └── User.java
+│       │   ├── service/
+│       │   │   ├── BookingService.java
+│       │   │   ├── FlightService.java
+│       │   │   ├── LocationService.java
+│       │   │   ├── PaymentService.java
+│       │   │   ├── SeatService.java
+│       │   │   └── UserService.java
+│       │   └── util/
+│       │       ├── PasswordUtil.java
+│       │       ├── PDFGenerator.java
+│       │       └── ValidationUtil.java
+│       ├── resources/
+│       │   ├── META-INF/
+│       │   │   └── persistence.xml
+│       │   ├── db.properties
+│       │   └── mail.properties
+│       └── webapp/
+│           ├── META-INF/
+│           │   └── context.xml
+│           ├── WEB-INF/
+│           │   ├── views/
+│           │   │   ├── admin/
+│           │   │   │   ├── booking-detail.jsp
+│           │   │   │   ├── booking-edit.jsp
+│           │   │   │   ├── booking-list.jsp
+│           │   │   │   ├── flight-add.jsp
+│           │   │   │   ├── flight-detail.jsp
+│           │   │   │   ├── flight-edit.jsp
+│           │   │   │   ├── flight-list.jsp
+│           │   │   │   ├── user-add.jsp
+│           │   │   │   ├── user-detail.jsp
+│           │   │   │   ├── user-edit.jsp
+│           │   │   │   └── user-list.jsp
+│           │   │   ├── auth/
+│           │   │   │   ├── login.jsp
+│           │   │   │   └── register.jsp
+│           │   │   ├── booking/
+│           │   │   │   ├── confirm.jsp
+│           │   │   │   ├── detail.jsp
+│           │   │   │   ├── flights.jsp
+│           │   │   │   └── list.jsp
+│           │   │   ├── common/
+│           │   │   │   ├── footer.jsp
+│           │   │   │   └── header.jsp
+│           │   │   ├── error/
+│           │   │   │   ├── 403.jsp
+│           │   │   │   ├── 404.jsp
+│           │   │   │   └── 500.jsp
+│           │   │   ├── home.jsp
+│           │   │   └── user/
+│           │   │       └── profile.jsp
+│           │   ├── beans.xml
+│           │   └── web.xml
+│           ├── resources/
+│           │   ├── css/
+│           │   │   ├── admin-styles.css
+│           │   │   └── style.css
+│           │   ├── images/
+│           │   │   ├── danang.jpg
+│           │   │   ├── hanoi.jpg
+│           │   │   └── hochiminh.jpg
+│           │   └── js/
+│           │       ├── admin-scripts.js
+│           │       └── script.js
+│           ├── index.html
+│           └── index.jsp
+├── WEB-INF/
+│   └── views/booking/flights.jsp
+├── .gitignore
+├── danh_sach_use_case.xlsx
+├── diagram.mwb
+├── nb-configuration.xml
+├── nbactions.xml
+├── pom.xml
+├── readme.md
+├── sql.sql
+└── TicketPlaneDB.sql
+```
 
-### 2. Danh sách Use Case chính
+## Main Use Cases
 
-### 2.1. Use Case của Khách hàng
+### Customer
 
-1. Đăng ký tài khoản – Tạo tài khoản khách hàng.
-2. Đăng nhập/Quên mật khẩu – Xác thực khách hàng.
-3. Tìm kiếm chuyến bay – Nhập thông tin điểm đi, điểm đến, ngày bay để tìm vé.
-4. Chọn chuyến bay và ghế ngồi – Chọn chuyến bay phù hợp và ghế ngồi mong muốn.
-5. Đặt vé máy bay – Nhập thông tin cá nhân, số hộ chiếu (nếu cần).
-6. Thanh toán vé máy bay – Liên kết với cổng thanh toán để thanh toán vé.
-7. Nhận vé điện tử – Hệ thống gửi vé qua email hoặc tin nhắn.
-8. Quản lý đặt chỗ – Xem lại thông tin đặt vé, chỉnh sửa nếu cần.
-9. Hủy vé/Đổi lịch bay – Hủy vé hoặc đổi lịch trình theo chính sách của hãng hàng không.
-10. Nhận thông báo – Nhận thông báo về chuyến bay qua email hoặc SMS.
+- Create an account, sign in, or reset a password
+- Search for flights by route and date
+- Choose a flight and seat
+- Enter passenger details and book a ticket
+- Pay for a booking and receive an e-ticket by email or SMS
+- View, manage, cancel, or change a booking (subject to airline policy)
+- Receive flight updates and reminders
 
----
+### Staff and Administrators
 
-### 2.2. Use Case của Nhân viên (Admin/Staff)
+- View and manage customers
+- Add, edit, or remove flight schedules
+- Review, cancel, or change bookings
+- Review payment transactions and process refunds when appropriate
+- Send flight updates and promotional notifications
+- View sales and cancellation reports
 
-1. Quản lý khách hàng – Xem, chỉnh sửa thông tin khách hàng.
-2. Quản lý chuyến bay – Thêm, sửa, xóa lịch trình chuyến bay.
-3. Quản lý đặt vé – Kiểm tra trạng thái đặt vé, hủy/đổi vé khi khách yêu cầu.
-4. Quản lý thanh toán – Kiểm tra giao dịch, hoàn tiền khi cần thiết.
-5. Quản lý thông báo – Gửi thông báo về chuyến bay thay đổi, khuyến mãi.
-6. Thống kê và báo cáo – Xem báo cáo doanh thu, số vé bán, số vé hủy.
+### External Systems
 
----
-
-### 2.3. Use Case của Hệ thống thanh toán
-
-1. Xử lý thanh toán – Liên kết với ngân hàng, ví điện tử để thực hiện giao dịch.
-2. Hoàn tiền – Xử lý yêu cầu hoàn tiền khi khách hủy vé.
-
----
-
-### 2.4. Use Case của Hệ thống hãng hàng không
-
-1. Cập nhật dữ liệu chuyến bay – Nhận thông tin từ hãng hàng không về thay đổi lịch trình.
-2. Xác nhận tình trạng ghế ngồi – Kiểm tra số lượng ghế còn trống.
-
----
-
-### 2.5. Use Case của Hệ thống thông báo
-
-1. Gửi xác nhận đặt vé – Gửi email/SMS khi đặt vé thành công.
-2. Thông báo thay đổi chuyến bay – Gửi thông báo khi chuyến bay bị hoãn, đổi giờ.
-3. Nhắc nhở trước giờ bay – Gửi nhắc nhở về thời gian check-in.
-
-========================
-
-CẤU TRÚC PROJECT
-TicketPlane-1.0-SNAPSHOT/
-│── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   ├── com/
-│   │   │   │   ├── mycompany/
-│   │   │   │   │   ├── ticketplane/
-│   │   │   │   │   │   ├── model/
-│   │   │   │   │   │   │   ├── User.java
-│   │   │   │   │   │   │   ├── Flight.java
-│   │   │   │   │   │   │   ├── Booking.java
-│   │   │   │   │   │   │   ├── Payment.java
-│   │   │   │   │   │   │   ├── Notification.java
-│   │   │   │   │   │   │   ├── Airport.java
-│   │   │   │   │   │   │   ├── Seat.java
-│   │   │   │   │   │   │   ├── FlightAirport.java
-│   │   │   │   │   │   ├── dao/
-│   │   │   │   │   │   │   ├── UserDAO.java
-│   │   │   │   │   │   │   ├── FlightDAO.java
-│   │   │   │   │   │   │   ├── BookingDAO.java
-│   │   │   │   │   │   │   ├── PaymentDAO.java
-│   │   │   │   │   │   │   ├── NotificationDAO.java
-│   │   │   │   │   │   │   ├── AirportDAO.java
-│   │   │   │   │   │   │   ├── SeatDAO.java
-│   │   │   │   │   │   │   ├── DAOFactory.java
-│   │   │   │   │   │   │   ├── DBConnection.java
-│   │   │   │   │   │   ├── service/
-│   │   │   │   │   │   │   ├── UserService.java
-│   │   │   │   │   │   │   ├── FlightService.java
-│   │   │   │   │   │   │   ├── BookingService.java
-│   │   │   │   │   │   │   ├── PaymentService.java
-│   │   │   │   │   │   │   ├── NotificationService.java
-│   │   │   │   │   │   │   ├── AirportService.java
-│   │   │   │   │   │   ├── controller/
-│   │   │   │   │   │   │   ├── auth/
-│   │   │   │   │   │   │   │   ├── LoginServlet.java
-│   │   │   │   │   │   │   │   ├── RegisterServlet.java
-│   │   │   │   │   │   │   │   ├── LogoutServlet.java
-│   │   │   │   │   │   │   │   ├── ForgotPasswordServlet.java
-│   │   │   │   │   │   │   ├── flight/
-│   │   │   │   │   │   │   │   ├── SearchFlightServlet.java
-│   │   │   │   │   │   │   │   ├── FlightDetailsServlet.java
-│   │   │   │   │   │   │   ├── booking/
-│   │   │   │   │   │   │   │   ├── BookTicketServlet.java
-│   │   │   │   │   │   │   │   ├── SelectSeatServlet.java
-│   │   │   │   │   │   │   │   ├── ViewBookingsServlet.java
-│   │   │   │   │   │   │   │   ├── CancelBookingServlet.java
-│   │   │   │   │   │   │   ├── payment/
-│   │   │   │   │   │   │   │   ├── ProcessPaymentServlet.java
-│   │   │   │   │   │   │   │   ├── PaymentConfirmationServlet.java
-│   │   │   │   │   │   │   ├── admin/
-│   │   │   │   │   │   │   │   ├── ManageUsersServlet.java
-│   │   │   │   │   │   │   │   ├── ManageFlightsServlet.java
-│   │   │   │   │   │   │   │   ├── ManageBookingsServlet.java
-│   │   │   │   │   │   │   │   ├── StatisticsServlet.java
-│   │   │   │   │   │   ├── util/
-│   │   │   │   │   │   │   ├── EmailUtil.java
-│   │   │   │   │   │   │   ├── PasswordUtil.java
-│   │   │   │   │   │   │   ├── ValidationUtil.java
-│   │   │   │   │   │   │   ├── PDFGenerator.java
-│   │   │   │   │   │   ├── filter/
-│   │   │   │   │   │   │   ├── AuthenticationFilter.java
-│   │   │   │   │   │   │   ├── AdminFilter.java
-│   │   │   │   │   │   ├── listener/
-│   │   │   │   │   │   │   ├── AppContextListener.java
-│   │   ├── resources/
-│   │   │   ├── META-INF/
-│   │   │   ├── db.properties
-│   │   │   ├── log4j.properties
-│   │   │   ├── mail-templates/
-│   │   │   │   ├── booking-confirmation.html
-│   │   │   │   ├── payment-confirmation.html
-│   │   │   │   ├── flight-reminder.html
-│   │   ├── webapp/
-│   │   │   ├── META-INF/
-│   │   │   │   ├── context.xml
-│   │   │   ├── WEB-INF/
-│   │   │   │   ├── beans.xml
-│   │   │   │   ├── web.xml
-│   │   │   │   ├── views/
-│   │   │   │   │   ├── auth/
-│   │   │   │   │   │   ├── login.jsp
-│   │   │   │   │   │   ├── register.jsp
-│   │   │   │   │   │   ├── forgot-password.jsp
-│   │   │   │   │   ├── flight/
-│   │   │   │   │   │   ├── search.jsp
-│   │   │   │   │   │   ├── search-results.jsp
-│   │   │   │   │   │   ├── details.jsp
-│   │   │   │   │   ├── booking/
-│   │   │   │   │   │   ├── passenger-info.jsp
-│   │   │   │   │   │   ├── select-seat.jsp
-│   │   │   │   │   │   ├── confirmation.jsp
-│   │   │   │   │   │   ├── my-bookings.jsp
-│   │   │   │   │   ├── payment/
-│   │   │   │   │   │   ├── payment-form.jsp
-│   │   │   │   │   │   ├── payment-confirmation.jsp
-│   │   │   │   │   ├── admin/
-│   │   │   │   │   │   ├── dashboard.jsp
-│   │   │   │   │   │   ├── manage-users.jsp
-│   │   │   │   │   │   ├── manage-flights.jsp
-│   │   │   │   │   │   ├── manage-bookings.jsp
-│   │   │   │   │   │   ├── statistics.jsp
-│   │   │   │   │   ├── common/
-│   │   │   │   │   │   ├── header.jsp
-│   │   │   │   │   │   ├── footer.jsp
-│   │   │   │   │   │   ├── navigation.jsp
-│   │   │   │   │   │   ├── error.jsp
-│   │   │   ├── assets/
-│   │   │   │   ├── css/
-│   │   │   │   │   ├── style.css
-│   │   │   │   │   ├── admin.css
-│   │   │   │   ├── js/
-│   │   │   │   │   ├── main.js
-│   │   │   │   │   ├── search.js
-│   │   │   │   │   ├── booking.js
-│   │   │   │   │   ├── payment.js
-│   │   │   │   ├── images/
-│   │   │   │   │   ├── logo.png
-│   │   │   │   │   ├── banner.jpg
-│   │   │   │   │   ├── seat-map.png
-│   │   │   ├── index.html
-│── nb-configuration.xml
-│── pom.xml
-│── README.md
-│── sql.sql
+- **Payment gateway:** processes ticket payments and refunds.
+- **Airline system:** provides flight schedules and seat availability.
+- **Notification system:** sends booking confirmations, schedule-change notices, and reminders.
